@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
@@ -318,17 +319,27 @@ namespace Raster {
         public:
             uint32_t colour;
             SolidColourShader(uint32_t colour) : colour(colour) {};
-            uint32_t getColour(const float2& texCoord) const override {
+            uint32_t getColour(const float2& UV) const override {
                 return colour;
             }
     };
 
     class TextureShader : public Shader {
         public:
-            TextureShader(const std::vector<std::vector<uint32_t>>& pixels) : pixels(pixels) {};
-            uint32_t getColour(const float2& texCoord) const override {
-                // TODO: nearest neighbor and whatnot
-                return 0xeeeeee;
+            TextureShader(const std::vector<std::vector<uint32_t>>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
+            uint32_t getColour(const float2& UV) const override {
+                float2 uv = UV;
+                uv.x = std::clamp(uv.x, 0.0f, 1.0f);
+                uv.y = std::clamp(uv.y, 0.0f, 1.0f);
+                uv.x *= width;
+                uv.y *= height;
+
+                // Nearest neighbour samplin'
+                uint32_t x = round(uv.x);
+                uint32_t y = round(uv.y);
+                if (x >= width) x = width-1;
+                if (y >= height) y = height-1;
+                return pixels.at(y).at(x);
             }
 
             static inline __attribute__((always_inline)) TextureShader loadFromFile(const std::string& path) {
@@ -400,10 +411,11 @@ namespace Raster {
                 outside:
 
 
-                return TextureShader(pixels);
+                return TextureShader(pixels, width, height);
             }
         private:
             std::vector<std::vector<uint32_t>> pixels;
+            uint32_t width, height;
     };
 
     // TODO: rework to have triangle3ds map to a triangle2d with corresponding texture coords (just change the pair to keep a triangle2d)
@@ -413,12 +425,12 @@ namespace Raster {
             Transform transform;
             std::shared_ptr<Shader> shader = nullptr;
             std::vector<std::pair<triangle3D, uint32_t>> faces; // the uint32_t for color is an artifact from the pre-shader era of my code, it's position at the company will be terminated shortly, we just can't fire it yet due to union contracts and whatnot red tape blah blah blah radical left
-            inline __attribute__((always_inline)) uint32_t getColor(const float2& texCoord, const uint32_t col) {
+            inline __attribute__((always_inline)) uint32_t getColor(const float2& uv, const uint32_t col=0xe6a000) {
                 if (!shader) {
                     return col; // temporary for migrating from the per-face colour to new shader system (for some reason try catch is EXTREMELY expensive so this is easier)
                     throw std::runtime_error("Null shader pointer");
                 }
-                return shader->getColour(texCoord);
+                return shader->getColour(uv);
             }
             static inline __attribute__((always_inline)) Model fromOBJ(const std::string&, const std::string&);
     };
