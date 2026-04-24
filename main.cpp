@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -13,8 +14,9 @@ using namespace Raster;
 #define SPEED 9.8f
 #define ROTATION_SPEED 45.0f
 
-#define SCREEN_HEIGHT 720
-#define SCREEN_WIDTH 1280
+
+#define SCREEN_WIDTH 1600
+#define SCREEN_HEIGHT 900
 
 // Blue: 0xff87ceeb
 #define BACKGROUND 0xff000000
@@ -22,7 +24,7 @@ using namespace Raster;
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout << "no" << endl;
-        return -1;
+        return EXIT_FAILURE;
     }
     const filesystem::path exePath(getExecutablePath());
     const filesystem::path exeDir(exePath.string().substr(0,exePath.string().length()-exePath.filename().string().length()));
@@ -99,10 +101,18 @@ int main() {
     int pinkTriState = 0;
     auto pinkTriEnd = newTime;
 
+    float (*depthBuffer)[SCREEN_WIDTH] = (float(*)[SCREEN_WIDTH])std::malloc(SCREEN_HEIGHT*SCREEN_WIDTH*sizeof(float));
+    if (depthBuffer == NULL) {
+        cerr << "malloc fail" << endl;
+        return EXIT_FAILURE;
+    }
 
-    float depthBuffer[SCREEN_HEIGHT][SCREEN_WIDTH];
     // This is the PROPER spelling of the word "colour", if you disagree please consult https://en.wiktionary.org/wiki/colour
-    uint32_t colourBuffer[SCREEN_HEIGHT][SCREEN_WIDTH]; // colourBuffer is ARGB
+    uint32_t (*colourBuffer)[SCREEN_WIDTH] = (uint32_t(*)[SCREEN_WIDTH])std::malloc(SCREEN_HEIGHT*SCREEN_WIDTH*sizeof(uint32_t)); // colourBuffer is ARGB
+    if (colourBuffer == NULL) {
+        cerr << "malloc fail" << endl;
+        return EXIT_FAILURE;
+    }
 
     while (run) {
         SDL_Event e;
@@ -325,5 +335,8 @@ int main() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyTexture(texture);
     SDL_Quit();
-    return 0;
+
+    free(colourBuffer);
+    free(depthBuffer);
+    return EXIT_SUCCESS;
 }
