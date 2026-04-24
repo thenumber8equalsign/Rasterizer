@@ -33,37 +33,43 @@ int main() {
 
     // create a triangle
     Model spinTri(Transform({0, 1, 0}, 0, 0, 0));
-    spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, 0xe6a000});
+    spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    spinTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a000));
 
     Model spinTriT(Transform({0, 1, 0}, 90, 0, 0));
-    spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, 0xe6a0ff});
+    spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    spinTriT.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
 
     Model pinkTri(Transform({5.0f, 1, 5.0f}, 0, 0, 0));
-    pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, 0xe6a0ff});
+    pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    pinkTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
 
     Model whiteTri(Transform({-5.0f, 1, -5.0f}, 0, 0, 0));
-    whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, 0xffffff});
+    whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    whiteTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
 
     Model greenTri(Transform({0, 5, 0}, 0, 90, 0));
-    greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, 0x00aa00});
+    greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt});
+    greenTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0x00aa00));
 
     float cubeSize = 10;
     Model ground(Transform({0, -cubeSize, 0}, 0, 0, 0));
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, 0xeeeeee});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, 0xaaaaaa});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, 0xeeeeee});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, 0xdddddd});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, 0xdddddd});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, 0xaaaaaa});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, 0xeeeeee});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, 0xaaaaaa});
-    ground.faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, 0xdddddd});
-    ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, 0xaaaaaa});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, 0xdddddd});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, 0xeeeeee});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
+    ground.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xdddddd));
 
     TextureShader::loadFromFile("resources/GREEN.bin");
-    Model obj = Model::fromOBJ(exeDir.string() + "resources/cube.obj", exeDir.string() + "resources/GREEN.bin");
+    Model obj = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/GREEN.bin");
     obj.transform.position = {0, 2, 10};
     obj.transform.setRotation(180, 0, 0);
     obj.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
@@ -75,7 +81,7 @@ int main() {
     scene.models.push_back(greenTri);// 3
     scene.models.push_back(ground);  // 4
     scene.models.push_back(spinTriT);// 5
-    scene.models.push_back(obj); 
+    scene.models.push_back(obj);
 
 
     bool run = true;
@@ -206,7 +212,7 @@ int main() {
             float3 ihat, jhat, khat;
             model.transform.fetchBasisVectors(&ihat, &jhat, &khat);
             for (int j = 0; j < model.faces.size(); ++j) {
-                const pair<triangle3D, uint32_t>& face = model.faces[j];
+                const pair<triangle3D, std::optional<triangle>>& face = model.faces[j];
                 // compute the new verticies of face based on the transformations in model.transform
                 // make point relative to camera, then rotate according to camera rotations (do later)
                 // compute the bounding box of each triangle, and test if a pixel is in the triangle
@@ -287,7 +293,13 @@ int main() {
 
                                 if (depth > depthBuffer[k][l]) continue;
                                 depthBuffer[k][l] = depth;
-                                uint32_t col = (face.second&0x00ffffff) + 0xff000000; // // add 0xff000000 for the alpha, this must be opaqe
+
+
+                                float2 uv = {0,0};
+                                if (face.second != nullopt) {
+                                    // TODO: interpolate texture coordinates via the same weights
+                                }
+                                uint32_t col = model.getColor(uv); // // add 0xff000000 for the alpha, this must be opaqe
 
                                 col = model.getColor({0.3f,0.5f},col);
 
