@@ -16,6 +16,9 @@ using namespace Raster;
 #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1280
 
+// Blue: 0xff87ceeb
+#define BACKGROUND 0xff000000
+
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout << "no" << endl;
@@ -72,7 +75,7 @@ int main() {
     Model obj = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/GREEN.bin");
     obj.transform.position = {0, 2, 10};
     obj.transform.setRotation(180, 0, 0);
-    obj.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
+    //obj.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<TextureShader>(TextureShader::loadFromFile(exeDir.string()+"resources/GREEN.bin")));
 
 
     scene.models.push_back(spinTri); // 0
@@ -203,7 +206,7 @@ int main() {
         for (int i = 0; i < SCREEN_HEIGHT; ++i) {
             for (int j = 0; j < SCREEN_WIDTH; ++j) {
                 depthBuffer[i][j] = INFINITY;
-                colourBuffer[i][j] = 0xff87ceeb; // initialize to the desired background colour (in this case sky blue)
+                colourBuffer[i][j] = BACKGROUND;
             }
         }
 
@@ -299,9 +302,8 @@ int main() {
                                 if (face.second != nullopt) {
                                     // TODO: interpolate texture coordinates via the same weights
                                 }
-                                uint32_t col = model.getColor(uv); // // add 0xff000000 for the alpha, this must be opaqe
 
-                                col = model.getColor({0.3f,0.5f},col);
+                                uint32_t col = model.getColour(uv) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
 
                                 colourBuffer[k][l] = col;
                             }
