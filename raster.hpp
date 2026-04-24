@@ -534,10 +534,14 @@ namespace Raster {
     }
 
     // Read from OBJ files
-    // TODO: texture from jpg
-    inline __attribute__((always_inline)) Model Model::fromOBJ(const std::string& objName, const std::string& texFile) {
+    inline __attribute__((always_inline)) Model Model::fromOBJ(const std::string& objName, const std::string& texFile = "") {
         std::ifstream file(objName.c_str());
         if (!file.is_open()) throw std::runtime_error("Could not open file");
+
+        std::optional<std::shared_ptr<TextureShader>> shader = std::nullopt;
+        if (texFile != "") {
+            shader = std::optional<std::shared_ptr<TextureShader>>(std::make_shared<TextureShader>(TextureShader::loadFromFile(texFile)));
+        }
 
         try {
             std::vector<std::string> allLines;
@@ -550,7 +554,9 @@ namespace Raster {
 
             tmp = "";
             std::vector<float3> verticies;
-            std::vector<std::tuple<float3, float3, float3, uint32_t>> faces;
+            std::vector<triangle3D> faces;
+            std::vector<float2> texCoords;
+            std::vector<triangle> texCoordTris;
 
             for (int i = 0; i < allLines.size(); ++i) {
                 std::string line = allLines[i];
@@ -571,6 +577,15 @@ namespace Raster {
                     // std::cout << "float3{ x=" << v.x << ", y=" << v.y << ", z=" << v.z << " }" << std::endl;
 
                     verticies.push_back(v);
+                } else if (line.substr(0,2) == "vt") {
+                    std::vector<std::string> values;
+                    values = split(line, " ");
+                    if (values.size() != 3 && values.size() != 4) throw std::exception();
+                    float2 v;
+                    // For UV maps, U corrosponds to the x coordinate on the image
+                    v.x = std::stof(values[1]);
+                    v.y = std::stof(values[2]);
+                    texCoords.push_back(v);
                 }
             }
 
@@ -594,21 +609,16 @@ namespace Raster {
                         throw std::exception();
                     }
 
-                    // we only care about the 1st column (for now) (TODO)
-                    const uint64_t indexA = std::stoull(slashSeperated.at(0).at(0)) - 1;
-                    const uint64_t indexB = std::stoull(slashSeperated.at(1).at(0)) - 1;
-                    const uint64_t indexC = std::stoull(slashSeperated.at(2).at(0)) - 1;
+                    uint64_t indexA = std::stoull(slashSeperated.at(0).at(0)) - 1;
+                    uint64_t indexB = std::stoull(slashSeperated.at(1).at(0)) - 1;
+                    uint64_t indexC = std::stoull(slashSeperated.at(2).at(0)) - 1;
 
+                    faces.push_back({verticies.at(indexA), verticies.at(indexB), verticies.at(indexC)});
 
-                    // generate a random colour
-                    // TODO: add an input for colour or smth like textures maybe
-                    uint32_t r = rand()%256; // generate [0,255]
-                    uint32_t g = rand()%256;
-                    uint32_t b = rand()%256;
-
-                    uint32_t col = (r<<16) + (g<<8) + (b<<0);
-
-                    faces.push_back(std::make_tuple(verticies.at(indexA), verticies.at(indexB), verticies.at(indexC), col));
+                    indexA = std::stoull(slashSeperated.at(0).at(1)) - 1;
+                    indexB = std::stoull(slashSeperated.at(1).at(1)) - 1;
+                    indexC = std::stoull(slashSeperated.at(2).at(1)) - 1;
+                    texCoordTris.push_back({texCoords.at(indexA), texCoords.at(indexB), texCoords.at(indexC)});
                 }
             }
 
@@ -616,11 +626,12 @@ namespace Raster {
             Model model(Transform({0,0,0},0,0,0)); // use a default transform, the caller can change this later
 
             for (int i = 0; i < faces.size(); ++i) {
-                triangle3D tri;
-                tri.a = std::get<0>(faces[i]);
-                tri.b = std::get<1>(faces[i]);
-                tri.c = std::get<2>(faces[i]);
-                model.faces.push_back(std::make_pair(tri, std::get<3>(faces[i])));
+                // populate model.faces
+                model.faces.push_back(std::make_pair(faces[i], std::optional<triangle>(texCoordTris[i])));
+            }
+
+            if (shader.has_value()) {
+                model.shader = std::dynamic_pointer_cast<Shader>(shader.value());
             }
 
             return model;
