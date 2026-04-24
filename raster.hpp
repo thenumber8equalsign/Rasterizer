@@ -325,7 +325,7 @@ namespace Raster {
 
     class TextureShader : public Shader {
         public:
-            TextureShader(const std::vector<std::vector<uint32_t>>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
+            TextureShader(const std::vector<uint32_t>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
             TextureShader(const TextureShader& other) : TextureShader(other.pixels, other.width, other.height) {}
 
             uint32_t getColour(const float2& UV) const override {
@@ -340,7 +340,7 @@ namespace Raster {
                 uint32_t y = round(uv.y);
                 if (x >= width) x = width-1;
                 if (y >= height) y = height-1;
-                return pixels.at(y).at(x);
+                return pixels.at(y*width+x);
             }
 
             static inline __attribute__((always_inline)) TextureShader loadFromFile(const std::string& path) {
@@ -389,7 +389,7 @@ namespace Raster {
                 // gcount will return the # of bytes actually read
                 f.close();
 
-                std::vector<std::vector<uint32_t>> pixels(height, std::vector<uint32_t>(width));
+                std::vector<uint32_t> pixels(height*width, 0);
                 buffer.erase(buffer.begin(), buffer.begin()+8); // remove the first 8 bytes, what remains will only be rgb values
 
 
@@ -405,14 +405,14 @@ namespace Raster {
                         uint8_t b = buffer.at(index+2);
                         index += 3;
                         uint32_t col = ((uint32_t(r)&0xff)<<16) | ((uint32_t(g)&0xff)<<8) | (uint32_t(b)&0xff);
-                        pixels.at(i).at(j) = col;
+                        pixels.at(i*width+j) = col;
                     }
                 }
 
                 return TextureShader(pixels, width, height);
             }
         private:
-            std::vector<std::vector<uint32_t>> pixels;
+            std::vector<uint32_t> pixels;
             uint32_t width, height;
     };
 
