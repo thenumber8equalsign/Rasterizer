@@ -327,6 +327,9 @@ namespace Raster {
     class TextureShader : public Shader {
         public:
             TextureShader(const std::vector<std::vector<uint32_t>>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
+            TextureShader(const TextureShader& other) {
+                TextureShader(other.pixels, other.width, other.height);
+            }
             uint32_t getColour(const float2& UV) const override {
                 float2 uv = UV;
                 uv.x = std::clamp(uv.x, 0.0f, 1.0f);
@@ -389,7 +392,7 @@ namespace Raster {
                 f.close();
 
                 std::vector<std::vector<uint32_t>> pixels(height, std::vector<uint32_t>(width));
-                buffer.erase(buffer.begin(), buffer.begin()+8);
+                buffer.erase(buffer.begin(), buffer.begin()+8); // remove the first 8 bytes, what remains will only be rgb values
 
 
                 size_t index = 0;
@@ -397,8 +400,7 @@ namespace Raster {
                     for (size_t j = 0; j < width; ++j) {
                         if (index+2>=buffer.size()) {
                             // this should never happen
-                            std::cerr << "unexpected behavior" << std::endl;
-                            goto outside;
+                            throw std::runtime_error("Unexpected error happened, despite our already checking file sizes");
                         }
                         uint8_t r = buffer.at(index);
                         uint8_t g = buffer.at(index+1);
@@ -408,8 +410,6 @@ namespace Raster {
                         pixels.at(i).at(j) = col;
                     }
                 }
-                outside:
-
 
                 return TextureShader(pixels, width, height);
             }
@@ -418,13 +418,12 @@ namespace Raster {
             uint32_t width, height;
     };
 
-    // TODO: rework to have triangle3ds map to a triangle2d with corresponding texture coords (just change the pair to keep a triangle2d)
     class Model {
         public:
             Model(Transform t) : transform(t) {};
             Transform transform;
             std::shared_ptr<Shader> shader = nullptr;
-            std::vector<std::pair<triangle3D, uint32_t>> faces; // the uint32_t for color is an artifact from the pre-shader era of my code, it's position at the company will be terminated shortly, we just can't fire it yet due to union contracts and whatnot red tape blah blah blah radical left
+            std::vector<std::pair<triangle3D, std::optional<triangle>>> faces;
             inline __attribute__((always_inline)) uint32_t getColor(const float2& uv, const uint32_t col=0xe6a000) {
                 if (!shader) {
                     return col; // temporary for migrating from the per-face colour to new shader system (for some reason try catch is EXTREMELY expensive so this is easier)
