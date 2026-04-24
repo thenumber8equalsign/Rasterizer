@@ -325,7 +325,6 @@ namespace Raster {
 
     class TextureShader : public Shader {
         public:
-            std::vector<std::vector<uint32_t>> pixels;
             TextureShader(const std::vector<std::vector<uint32_t>>& pixels) : pixels(pixels) {};
             uint32_t getColour(const float2& texCoord) const override {
                 // TODO: nearest neighbor and whatnot
@@ -403,6 +402,8 @@ namespace Raster {
 
                 return TextureShader(pixels);
             }
+        private:
+            std::vector<std::vector<uint32_t>> pixels;
     };
 
     // TODO: rework to have triangle3ds map to a triangle2d with corresponding texture coords (just change the pair to keep a triangle2d)
