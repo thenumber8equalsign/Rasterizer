@@ -326,9 +326,8 @@ namespace Raster {
     class TextureShader : public Shader {
         public:
             TextureShader(const std::vector<std::vector<uint32_t>>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
-            TextureShader(const TextureShader& other) {
-                TextureShader(other.pixels, other.width, other.height);
-            }
+            TextureShader(const TextureShader& other) : TextureShader(other.pixels, other.width, other.height) {}
+
             uint32_t getColour(const float2& UV) const override {
                 float2 uv = UV;
                 uv.x = std::clamp(uv.x, 0.0f, 1.0f);
@@ -423,7 +422,7 @@ namespace Raster {
             Transform transform;
             std::shared_ptr<Shader> shader = nullptr;
             std::vector<std::pair<triangle3D, std::optional<triangle>>> faces;
-            inline __attribute__((always_inline)) uint32_t getColor(const float2& uv, const uint32_t col=0xe6a000) {
+            inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const uint32_t col=0xe6a000) {
                 if (!shader) {
                     return col; // temporary for migrating from the per-face colour to new shader system (for some reason try catch is EXTREMELY expensive so this is easier)
                     throw std::runtime_error("Null shader pointer");
