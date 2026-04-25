@@ -15,8 +15,8 @@ using namespace Raster;
 #define ROTATION_SPEED 45.0f
 
 
-#define SCREEN_WIDTH 1600
-#define SCREEN_HEIGHT 900
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 // Blue: 0xff87ceeb
 #define BACKGROUND 0xff000000
@@ -79,7 +79,6 @@ int main() {
 
     Model obj2 = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
     obj2.transform.position = {-2, 3, -10};
-
 
     scene.models.push_back(spinTri); // 0
     scene.models.push_back(pinkTri); // 1
@@ -313,8 +312,8 @@ int main() {
                                 if (face.second != nullopt) {
                                     // TODO: interpolate texture coordinates via the same weights
                                     const triangle& uvs = face.second.value();
-                                    float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
-                                    float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
+                                    const float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
+                                    const float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
 
                                     uv.x = dot3(u,weight)*depth;
                                     uv.y = dot3(v,weight)*depth;
