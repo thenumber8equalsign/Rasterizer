@@ -21,8 +21,6 @@ using namespace Raster;
 // Blue: 0xff87ceeb
 #define BACKGROUND 0xff000000
 
-// BIG TODO: some faces are flipped, maybe from like the uhh point p on line 301, but still check getColour by testing a value in blender
-
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout << "no" << endl;
@@ -82,6 +80,11 @@ int main() {
     Model obj2 = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
     obj2.transform.position = {-2, 3, -10};
 
+    Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes.transform.position = {2, 2, 2};
+
+
+
     scene.models.push_back(spinTri); // 0
     scene.models.push_back(pinkTri); // 1
     scene.models.push_back(whiteTri);// 2
@@ -90,6 +93,7 @@ int main() {
     scene.models.push_back(spinTriT);// 5
     scene.models.push_back(obj);
     scene.models.push_back(obj2);
+    scene.models.push_back(axes);
 
     bool run = true;
     uint8_t wasdqe = 0b000000;

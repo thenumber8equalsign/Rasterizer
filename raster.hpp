@@ -543,6 +543,7 @@ namespace Raster {
     }
 
     // Read from OBJ files
+    // When exporting from blender, one must first mirror everything along y, then export with default settings (-z as forward and y as up)
     inline __attribute__((always_inline)) Model Model::fromOBJ(const std::string& objName, const std::string& texFile = "") {
         std::ifstream file(objName.c_str());
         if (!file.is_open()) throw std::runtime_error("Could not open file");
