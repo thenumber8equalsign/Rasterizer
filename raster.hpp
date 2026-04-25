@@ -200,6 +200,7 @@ namespace Raster {
         pitch = toRadians(pitch);
         roll = toRadians(roll);
 
+        //TODO: make this mod instead of loop
         while (yaw > 2*M_PIf) {
             yaw -= 2*M_PIf;
         }
