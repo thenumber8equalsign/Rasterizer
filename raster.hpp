@@ -134,6 +134,10 @@ namespace Raster {
         s << "float3{ x=" << f3.x << ", y=" << f3.y << ", z=" << f3.z << " }";
         return s;
     }
+    inline __attribute__((always_inline)) std::ostream& operator<<(std::ostream& s, const float2& f2) {
+        s << "float2{ x=" << f2.x << ", y=" << f2.y << " }";
+        return s;
+    }
 
     struct triangle {
         float2 a, b, c;
@@ -340,17 +344,13 @@ namespace Raster {
             TextureShader(const TextureShader& other) : TextureShader(other.pixels, other.width, other.height) {}
 
             uint32_t getColour(const float2& UV) const override {
-                float2 uv = UV;
-                uv.x = std::clamp(uv.x, 0.0f, 1.0f);
-                uv.y = std::clamp(uv.y, 0.0f, 1.0f);
-                uv.x *= width;
-                uv.y *= height;
-
                 // Nearest neighbour samplin'
-                uint32_t x = uv.x;
-                uint32_t y = uv.y;
+                uint32_t x = (uint32_t)(UV.x*width);
+                uint32_t y = (uint32_t)((1-UV.y)*height);
                 if (x >= width) x = width-1;
                 if (y >= height) y = height-1;
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
                 return pixels.at(y*width+x);
             }
 
