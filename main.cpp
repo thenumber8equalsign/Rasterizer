@@ -21,6 +21,8 @@ using namespace Raster;
 // Blue: 0xff87ceeb
 #define BACKGROUND 0xff000000
 
+// BIG TODO: some faces are flipped, maybe from like the uhh point p on line 301, but still check getColour by testing a value in blender
+
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout << "no" << endl;
@@ -77,7 +79,7 @@ int main() {
     obj.transform.position = {0, 2, 10};
     obj.transform.setRotation(180, 0, 0);
 
-    Model obj2 = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
+    Model obj2 = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
     obj2.transform.position = {-2, 3, -10};
 
     scene.models.push_back(spinTri); // 0
