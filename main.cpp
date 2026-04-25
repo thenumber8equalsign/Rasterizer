@@ -73,11 +73,12 @@ int main() {
     ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
     ground.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xdddddd));
 
-    TextureShader::loadFromFile("resources/GREEN.bin");
-    Model obj = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/GREEN.bin");
+    Model obj = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
     obj.transform.position = {0, 2, 10};
     obj.transform.setRotation(180, 0, 0);
-    //obj.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<TextureShader>(TextureShader::loadFromFile(exeDir.string()+"resources/GREEN.bin")));
+
+    Model obj2 = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
+    obj2.transform.position = {-2, 3, -10};
 
 
     scene.models.push_back(spinTri); // 0
@@ -87,7 +88,7 @@ int main() {
     scene.models.push_back(ground);  // 4
     scene.models.push_back(spinTriT);// 5
     scene.models.push_back(obj);
-
+    scene.models.push_back(obj2);
 
     bool run = true;
     uint8_t wasdqe = 0b000000;
@@ -311,6 +312,12 @@ int main() {
                                 float2 uv = {0,0};
                                 if (face.second != nullopt) {
                                     // TODO: interpolate texture coordinates via the same weights
+                                    const triangle& uvs = face.second.value();
+                                    float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
+                                    float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
+
+                                    uv.x = dot3(u,weight)*depth;
+                                    uv.y = dot3(v,weight)*depth;
                                 }
 
                                 uint32_t col = model.getColour(uv) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
