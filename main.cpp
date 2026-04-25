@@ -19,7 +19,7 @@ using namespace Raster;
 #define SCREEN_HEIGHT 720
 
 // Blue: 0xff87ceeb
-#define BACKGROUND 0xff000000
+#define BACKGROUND 0xff87ceeb
 
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -83,7 +83,8 @@ int main() {
     Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes.transform.position = {2, 2, 2};
 
-
+    Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
+    minecraft.transform.position = {-2, 2, 2};
 
     scene.models.push_back(spinTri); // 0
     scene.models.push_back(pinkTri); // 1
@@ -94,6 +95,7 @@ int main() {
     scene.models.push_back(obj);
     scene.models.push_back(obj2);
     scene.models.push_back(axes);
+    scene.models.push_back(minecraft);
 
     bool run = true;
     uint8_t wasdqe = 0b000000;
