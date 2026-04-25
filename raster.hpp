@@ -313,9 +313,16 @@ namespace Raster {
             TextureShader(const TextureShader& other) : TextureShader(other.pixels, other.width, other.height) {}
 
             uint32_t getColour(const float2& UV) const override {
+                float2 uv = UV;
+
+                if (uv.x > 1) uv.x = 1.0f;
+                else if (uv.x < 0) uv.x = 0.0f;
+                if (uv.y > 1) uv.y = 1.0f;
+                else if (uv.y < 0) uv.y = 0.0f;
+
                 // Nearest neighbour samplin'
-                uint32_t x = (uint32_t)(UV.x*width);
-                uint32_t y = (uint32_t)((1-UV.y)*height);
+                uint32_t x = (uint32_t)(uv.x*width);
+                uint32_t y = (uint32_t)((1-uv.y)*height);
                 if (x >= width) x = width-1;
                 if (y >= height) y = height-1;
                 if (x < 0) x = 0;
