@@ -25,6 +25,13 @@ namespace Raster {
         return rad*180.0f/M_PIf;
     }
 
+    inline __attribute__((always_inline)) float m(float a, float b) {
+        return a-b*floor(a/b);
+    }
+    inline __attribute__((always_inline)) float normalizeAngle(float rads) {
+        return m(rads,2*M_PIf);
+    }
+
     #ifdef __linux__
     inline __attribute__((always_inline)) std::string getExecutablePath() {
         char path[PATH_MAX+1];
@@ -163,6 +170,11 @@ namespace Raster {
                 *jhat = this->jHat;
                 *khat = this->kHat;
             }
+            inline __attribute__((always_inline)) void fetchInverseBasisVectors(float3* ihat, float3* jhat, float3* khat) {
+                *ihat = this->iHatInv;
+                *jhat = this->jHatInv;
+                *khat = this->kHatInv;
+            }
 
             Transform* parent = nullptr;
             float3 position;
@@ -180,13 +192,14 @@ namespace Raster {
             inline __attribute__((always_inline)) static float3 transformVector(const float3& iHat, const float3& jHat, const float3& kHat, const float3& v) {
                 return v.x * iHat + v.y * jHat + v.z * kHat;
             }
-            inline __attribute__((always_inline)) void computeInverseBasisVectors(float3* iHat, float3* jHat, float3* kHat);
         private:
             float yaw, pitch, roll;
             float3 iHat, jHat, kHat;
             //     right, up , forward
+            float3 iHatInv, jHatInv, kHatInv;
 
             inline __attribute__((always_inline)) void computeBasisVectors(float3* iHat, float3* jHat, float3* kHat);
+            inline __attribute__((always_inline)) void computeInverseBasisVectors(float3* iHat, float3* jHat, float3* kHat);
     };
 
     Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll) {
@@ -196,76 +209,31 @@ namespace Raster {
     }
 
     inline __attribute__((always_inline)) void Transform::setRotation(float yaw, float pitch, float roll) {
-        yaw = toRadians(yaw);
-        pitch = toRadians(pitch);
-        roll = toRadians(roll);
-
-        //TODO: make this mod instead of loop
-        while (yaw > 2*M_PIf) {
-            yaw -= 2*M_PIf;
-        }
-        while (yaw < 0) {
-            yaw += 2*M_PIf;
-        }
-        this->yaw = yaw;
-
-        while (pitch > 2*M_PIf) {
-            pitch -= 2*M_PIf;
-        }
-        while (pitch < 0) {
-            pitch += 2*M_PIf;
-        }
-        this->pitch = pitch;
-
-        while (roll > 2*M_PIf) {
-            roll -= 2*M_PIf;
-        }
-        while (roll < 0) {
-            roll += 2*M_PIf;
-        }
-        this->roll = roll;
+        this->yaw = normalizeAngle(toRadians(yaw));
+        this->pitch = normalizeAngle(toRadians(pitch));
+        this->roll = normalizeAngle(toRadians(roll));
 
         updateBasisVectors();
     }
 
     inline __attribute__((always_inline)) void Transform::setYaw(float yaw) {
-        yaw = toRadians(yaw);
-        while (yaw > 2*M_PIf) {
-            yaw -= 2*M_PIf;
-        }
-        while (yaw < 0) {
-            yaw += 2*M_PIf;
-        }
-        this->yaw = yaw;
+        this->yaw = normalizeAngle(toRadians(yaw));
         updateBasisVectors();
     }
 
     inline __attribute__((always_inline)) void Transform::setPitch(float pitch) {
-        pitch = toRadians(pitch);
-        while (pitch > 2*M_PIf) {
-            pitch -= 2*M_PIf;
-        }
-        while (pitch < 0) {
-            pitch += 2*M_PIf;
-        }
-        this->pitch = pitch;
+        this->pitch = normalizeAngle(toRadians(pitch));
         updateBasisVectors();
     }
 
     inline __attribute__((always_inline)) void Transform::setRoll(float roll) {
-        roll = toRadians(roll);
-        while (roll > 2*M_PIf) {
-            roll -= 2*M_PIf;
-        }
-        while (roll < 0) {
-            roll += 2*M_PIf;
-        }
-        this->roll = roll;
+        this->roll = normalizeAngle(toRadians(roll));
         updateBasisVectors();
     }
 
     inline __attribute__((always_inline)) void Transform::updateBasisVectors() {
         computeBasisVectors(&iHat, &jHat, &kHat);
+        computeInverseBasisVectors(&iHatInv, &jHatInv, &kHatInv);
     }
 
     inline __attribute__((always_inline)) void Transform::computeBasisVectors(float3* iHat, float3* jHat, float3* kHat) {

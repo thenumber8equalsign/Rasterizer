@@ -212,7 +212,7 @@ int main() {
         float3 ihatcam, jhatcam, khatcam;
         float3 ihatcaminv, jhatcaminv, khatcaminv;
         scene.camera.transform.fetchBasisVectors(&ihatcam, &jhatcam, &khatcam);
-        scene.camera.transform.computeInverseBasisVectors(&ihatcaminv, &jhatcaminv, &khatcaminv);
+        scene.camera.transform.fetchInverseBasisVectors(&ihatcaminv, &jhatcaminv, &khatcaminv);
         // cout << khatcam.x << " " << khatcam.y << " " << khatcam.z << endl;
         if (wasdqe & (1<<5)) scene.camera.transform.position += deltaTime*SPEED*Transform::transformVector(ihatcam, jhatcam, khatcam, float3_forward);
         if (wasdqe & (1<<4)) scene.camera.transform.position -= deltaTime*SPEED*Transform::transformVector(ihatcam, jhatcam, khatcam, float3_right);
