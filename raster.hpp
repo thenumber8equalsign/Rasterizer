@@ -47,6 +47,14 @@ namespace Raster {
         inline __attribute__((always_inline)) float2 operator*(float scalar) const {
             return {x*scalar, y*scalar};
         }
+        inline __attribute__((always_inline)) float2 operator/(float scalar) const {
+            return {x/scalar, y/scalar};
+        }
+        inline __attribute__((always_inline)) float2& operator*=(float scalar) {
+            x *=scalar;
+            y *=scalar;
+            return *this;
+        }
         inline __attribute__((always_inline)) float2 operator+(const float2& other) const {
             return {x+other.x, y+other.y};
         }
@@ -74,6 +82,9 @@ namespace Raster {
 
         inline __attribute__((always_inline)) float3 operator*(float scalar) const {
             return {x*scalar, y*scalar, z*scalar};
+        }
+        inline __attribute__((always_inline)) float3 operator/(float scalar) const {
+            return {x/scalar, y/scalar, z/scalar};
         }
         inline __attribute__((always_inline)) float3 operator+(const float3& other) const {
             return {x+other.x, y+other.y, z+other.z};
@@ -336,8 +347,8 @@ namespace Raster {
                 uv.y *= height;
 
                 // Nearest neighbour samplin'
-                uint32_t x = round(uv.x);
-                uint32_t y = round(uv.y);
+                uint32_t x = uv.x;
+                uint32_t y = uv.y;
                 if (x >= width) x = width-1;
                 if (y >= height) y = height-1;
                 return pixels.at(y*width+x);
