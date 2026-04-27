@@ -38,19 +38,19 @@ int main() {
 
     // create a triangle
     Model spinTri(Transform({0, 1, 0}, 0, 0, 0));
-    spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
     spinTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a000));
 
     Model spinTriT(Transform({0, 1, 0}, 90, 0, 0));
-    spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
     spinTriT.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
 
     Model pinkTri(Transform({5.0f, 1, 5.0f}, 0, 0, 0));
-    pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
     pinkTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
 
     Model whiteTri(Transform({-5.0f, 1, -5.0f}, 0, 0, 0));
-    whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt});
+    whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
     whiteTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
 
     Model greenTri(Transform({0, 5, 0}, 0, 90, 0));
@@ -168,11 +168,12 @@ int main() {
         newTime = chrono::high_resolution_clock::now();
         float deltaTime = chrono::duration<float>(newTime-oldTime).count();
         oldTime = newTime;
-        scene.models[0].transform.setYaw(scene.models[0].transform.getYaw() + 270.0f*deltaTime);
-        scene.models[4].transform.setYaw(scene.models[4].transform.getYaw() + 45.0f*deltaTime);
-        scene.models[5].transform.setYaw(scene.models[5].transform.getYaw() + 180.0f*deltaTime);
-        scene.models[3].transform.setRoll(scene.models[3].transform.getRoll() + 30.0f*deltaTime);
-        scene.models[3].transform.setPitch(scene.models[3].transform.getPitch() + 30.0f*deltaTime);
+        scene.models[0].transform.incYaw(270.0f*deltaTime);
+        scene.models[4].transform.incYaw(45.0f*deltaTime);
+        scene.models[5].transform.incYaw(180.0f*deltaTime);
+        scene.models[3].transform.incRoll(30.0f*deltaTime);
+        scene.models[3].transform.incPitch(30.0f*deltaTime);
+        scene.models[6].transform.incYaw(60.0f*deltaTime);
 
         if (scene.models[3].transform.position.y > 15) {
             greenTriMoveUp = false;
@@ -183,19 +184,19 @@ int main() {
         scene.models[3].transform.position.y += (greenTriMoveUp ? 1 : -1)*deltaTime*5;
 
         if (pinkTriState == 0) {
-            scene.models[1].transform.setYaw(scene.models[1].transform.getYaw() + 15.0f*deltaTime);
+            scene.models[1].transform.incYaw(15.0f*deltaTime);
             if (scene.models[1].transform.getYaw() >= 135.0f) {
                 scene.models[1].transform.setYaw(135.0f);
                 ++pinkTriState;
             }
         } else if (pinkTriState == 1) {
-            scene.models[1].transform.setPitch(scene.models[1].transform.getPitch() + 15.0f*deltaTime);
+            scene.models[1].transform.incPitch(15.0f*deltaTime);
             if (scene.models[1].transform.getPitch() >= 70.0f) {
                 scene.models[1].transform.setPitch(70.0f);
                 ++pinkTriState;
             }
         } else if (pinkTriState == 2) {
-            scene.models[1].transform.setRoll(scene.models[1].transform.getRoll() + 15.0f*deltaTime);
+            scene.models[1].transform.incRoll(15.0f*deltaTime);
             if (scene.models[1].transform.getRoll() >= 90.0f) {
                 scene.models[1].transform.setRoll(90.0f);
                 ++pinkTriState;

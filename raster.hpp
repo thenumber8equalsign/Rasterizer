@@ -200,6 +200,10 @@ namespace Raster {
             inline __attribute__((always_inline)) void setPitch(float pitch);
             inline __attribute__((always_inline)) void setRoll(float roll);
 
+            inline __attribute__((always_inline)) void incYaw(float inc);
+            inline __attribute__((always_inline)) void incPitch(float inc);
+            inline __attribute__((always_inline)) void incRoll(float inc);
+
             inline __attribute__((always_inline)) void setRotation(float yaw, float pitch, float roll);
 
             inline __attribute__((always_inline)) float getYaw() {return toDegrees(yaw);};
@@ -245,6 +249,21 @@ namespace Raster {
 
     inline __attribute__((always_inline)) void Transform::setRoll(float roll) {
         this->roll = normalizeAngle(toRadians(roll));
+        updateBasisVectors();
+    }
+
+    inline __attribute__((always_inline)) void Transform::incYaw(float inc) {
+        yaw = normalizeAngle(yaw + toRadians(inc));
+        updateBasisVectors();
+    }
+
+    inline __attribute__((always_inline)) void Transform::incPitch(float inc) {
+        pitch = normalizeAngle(pitch + toRadians(inc));
+        updateBasisVectors();
+    }
+
+    inline __attribute__((always_inline)) void Transform::incRoll(float inc) {
+        roll = normalizeAngle(roll + toRadians(inc));
         updateBasisVectors();
     }
 
