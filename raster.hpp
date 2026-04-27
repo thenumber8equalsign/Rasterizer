@@ -544,10 +544,9 @@ namespace Raster {
     }
 
 
-    inline __attribute__((always_inline)) std::optional<triangle3D> project(triangle3D tri, const Camera& camera, const int screenHeightPixels, const bool& debug = false) {
+    inline __attribute__((always_inline)) std::optional<triangle3D> project(triangle3D tri, const Camera& camera, const int screenHeightPixels) {
         // p should be relative to the camera, and all transformations should already be applied
         if (tri.a.z <= camera.nearClip || tri.b.z <= camera.nearClip || tri.c.z <= camera.nearClip) {
-            if (debug) std::cout << "Clipping" <<std::endl;
             return std::nullopt;
         }
         const float screenHeight = 2*tanf(toRadians(camera.fov/2));
