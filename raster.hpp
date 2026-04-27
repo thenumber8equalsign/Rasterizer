@@ -550,10 +550,11 @@ namespace Raster {
                     // we expect points to be a 4, or 5 dimensional vector (since the leading v is included), all containing floats
                     if (values.size() != 4 && values.size() != 5) throw std::exception();
 
+                    const float w = (values.size() == 5) ? std::stof(values[4]) : 1;
                     float3 v;
-                    v.x = std::stof(values[1]);
-                    v.y = std::stof(values[2]);
-                    v.z = std::stof(values[3]);
+                    v.x = std::stof(values[1]) / w;
+                    v.y = std::stof(values[2]) / w;
+                    v.z = std::stof(values[3]) / w;
 
                     // float3{ x=-1, y=-1, z=1 }
                     // std::cout << "float3{ x=" << v.x << ", y=" << v.y << ", z=" << v.z << " }" << std::endl;
