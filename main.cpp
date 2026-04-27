@@ -83,8 +83,8 @@ int main() {
     Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes.transform.position = {2, 2, 2};
 
-    Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
-    minecraft.transform.position = {-2, 2, 2};
+    // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
+    // minecraft.transform.position = {-2, 2, 2};
 
     scene.models.push_back(spinTri); // 0
     scene.models.push_back(pinkTri); // 1
@@ -95,7 +95,7 @@ int main() {
     scene.models.push_back(obj);
     scene.models.push_back(obj2);
     scene.models.push_back(axes);
-    scene.models.push_back(minecraft);
+    // scene.models.push_back(minecraft);
 
     bool run = true;
     uint8_t wasdqe = 0b000000;
@@ -233,14 +233,14 @@ int main() {
             float3 ihat, jhat, khat;
             model.transform.fetchBasisVectors(&ihat, &jhat, &khat);
             for (int j = 0; j < model.faces.size(); ++j) {
-                const pair<triangle3D, std::optional<triangle>>& face = model.faces[j];
+                const Face& face = model.faces[j];
                 // compute the new verticies of face based on the transformations in model.transform
                 // make point relative to camera, then rotate according to camera rotations (do later)
                 // compute the bounding box of each triangle, and test if a pixel is in the triangle
                 // if it is in the triangle, draw the pixel
                 // do some stuff with a depth buffer
 
-                float3 a = face.first.a, b = face.first.b, c = face.first.c;
+                float3 a = face.verticies.a, b = face.verticies.b, c = face.verticies.c;
 
                 // Rotate along the model's basis vectors
                 a = Transform::transformVector(ihat, jhat, khat, a);
@@ -317,8 +317,8 @@ int main() {
 
 
                                 float2 uv = {0,0};
-                                if (face.second != nullopt) {
-                                    const triangle& uvs = face.second.value();
+                                if (face.texCoords != nullopt) {
+                                    const triangle& uvs = face.texCoords.value();
                                     const float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
                                     const float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
 

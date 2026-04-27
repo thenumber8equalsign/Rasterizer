@@ -402,12 +402,19 @@ namespace Raster {
             uint32_t width, height;
     };
 
+    struct Face {
+        triangle3D verticies;
+        std::optional<triangle> texCoords;
+        std::optional<triangle3D> normals;
+    };
+    typedef struct Face Face;
+
     class Model {
         public:
             Model(Transform t) : transform(t) {};
             Transform transform;
             std::shared_ptr<Shader> shader = nullptr;
-            std::vector<std::pair<triangle3D, std::optional<triangle>>> faces;
+            std::vector<Face> faces;
             inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const uint32_t col=0xe6a000) {
                 if (!shader) {
                     return col; // temporary for migrating from the per-face colour to new shader system (for some reason try catch is EXTREMELY expensive so this is easier)
@@ -609,7 +616,7 @@ namespace Raster {
 
             for (int i = 0; i < faces.size(); ++i) {
                 // populate model.faces
-                model.faces.push_back(std::make_pair(faces[i], std::optional<triangle>(texCoordTris[i])));
+                model.faces.push_back({faces[i], std::optional<triangle>(texCoordTris[i])});
             }
 
             if (shader.has_value()) {
