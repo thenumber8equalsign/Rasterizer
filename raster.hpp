@@ -544,9 +544,10 @@ namespace Raster {
 
             tmp = "";
             std::vector<float3> verticies;
-            std::vector<triangle3D> faces;
             std::vector<float2> texCoords;
-            std::vector<triangle> texCoordTris;
+            std::vector<float3> normals;
+
+            std::vector<Face> faces;
 
             for (int i = 0; i < allLines.size(); ++i) {
                 std::string line = allLines[i];
@@ -576,6 +577,16 @@ namespace Raster {
                     v.x = std::stof(values[1]);
                     v.y = std::stof(values[2]);
                     texCoords.push_back(v);
+                } else if (line.substr(0,2) == "vn") {
+                    std::vector<std::string> values;
+                    values = split(line, " ");
+                    if (values.size() != 4) throw std::exception();
+
+                    float3 v;
+                    v.x = std::stof(values[1]);
+                    v.y = std::stof(values[2]);
+                    v.z = std::stof(values[3]);
+                    normals.push_back(v);
                 }
             }
 
@@ -602,22 +613,29 @@ namespace Raster {
                     uint64_t indexB = std::stoull(slashSeperated.at(1).at(0)) - 1;
                     uint64_t indexC = std::stoull(slashSeperated.at(2).at(0)) - 1;
 
-                    faces.push_back({verticies.at(indexA), verticies.at(indexB), verticies.at(indexC)});
+                    Face face;
+                    face.verticies = {verticies.at(indexA), verticies.at(indexB), verticies.at(indexC)};
 
                     indexA = std::stoull(slashSeperated.at(0).at(1)) - 1;
                     indexB = std::stoull(slashSeperated.at(1).at(1)) - 1;
                     indexC = std::stoull(slashSeperated.at(2).at(1)) - 1;
-                    texCoordTris.push_back({texCoords.at(indexA), texCoords.at(indexB), texCoords.at(indexC)});
+
+                    face.texCoords = {texCoords.at(indexA), texCoords.at(indexB), texCoords.at(indexC)};
+
+                    indexA = std::stoull(slashSeperated.at(0).at(2)) - 1;
+                    indexB = std::stoull(slashSeperated.at(1).at(2)) - 1;
+                    indexC = std::stoull(slashSeperated.at(2).at(2)) - 1;
+
+                    face.normals = {normals.at(indexA), normals.at(indexB), normals.at(indexC)};
+
+                    faces.push_back(face);
                 }
             }
 
             // create a vector of triangle3D now to go with our model
             Model model(Transform({0,0,0},0,0,0)); // use a default transform, the caller can change this later
 
-            for (int i = 0; i < faces.size(); ++i) {
-                // populate model.faces
-                model.faces.push_back({faces[i], std::optional<triangle>(texCoordTris[i])});
-            }
+            model.faces = faces;
 
             if (shader.has_value()) {
                 model.shader = std::dynamic_pointer_cast<Shader>(shader.value());
