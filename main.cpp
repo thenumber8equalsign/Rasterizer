@@ -86,7 +86,7 @@ int main() {
     axes.transform.position = {2, 2, 2};
 
     Model sphere = Model::fromOBJ(exeDir.string() + "resources/sphere.obj");
-    sphere.transform.position = {-10, 0, 10};
+    sphere.transform.position = {-10, 2, 10};
     sphere.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
