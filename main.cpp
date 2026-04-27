@@ -318,7 +318,6 @@ int main() {
 
                                 float2 uv = {0,0};
                                 if (face.second != nullopt) {
-                                    // TODO: interpolate texture coordinates via the same weights
                                     const triangle& uvs = face.second.value();
                                     const float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
                                     const float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
