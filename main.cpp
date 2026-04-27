@@ -39,23 +39,23 @@ int main() {
     // create a triangle
     Model spinTri(Transform({0, 1, 0}, 0, 0, 0));
     spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    spinTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a000));
+    spinTri.shader = std::make_shared<SolidColourShader>(0xe6a000);
 
     Model spinTriT(Transform({0, 1, 0}, 90, 0, 0));
     spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    spinTriT.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
+    spinTriT.shader = std::make_shared<SolidColourShader>(0xe6a0ff);
 
     Model pinkTri(Transform({5.0f, 1, 5.0f}, 0, 0, 0));
     pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    pinkTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xe6a0ff));
+    pinkTri.shader = std::make_shared<SolidColourShader>(0xe6a0ff);
 
     Model whiteTri(Transform({-5.0f, 1, -5.0f}, 0, 0, 0));
     whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    whiteTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
+    whiteTri.shader = std::make_shared<SolidColourShader>(0xffffff);
 
     Model greenTri(Transform({0, 5, 0}, 0, 90, 0));
     greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt, std::nullopt});
-    greenTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0x00aa00));
+    greenTri.shader = std::make_shared<SolidColourShader>(0x00aa00);
 
     float cubeSize = 10;
     Model ground(Transform({0, -cubeSize, 0}, 0, 0, 0));
@@ -71,7 +71,7 @@ int main() {
     ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
     ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
     ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xdddddd));
+    ground.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
     Model monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
     monkey.transform.position = {0, 2, 10};
@@ -179,6 +179,8 @@ int main() {
         scene.models[3].transform.incRoll(30.0f*deltaTime);
         scene.models[3].transform.incPitch(30.0f*deltaTime);
         scene.models[6].transform.incYaw(60.0f*deltaTime);
+        scene.models[6].transform.incPitch(60.0f*deltaTime);
+        scene.models[6].transform.incRoll(60.0f*deltaTime);
 
         if (scene.models[3].transform.position.y > 15) {
             greenTriMoveUp = false;

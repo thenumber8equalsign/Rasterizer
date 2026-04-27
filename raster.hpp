@@ -697,7 +697,7 @@ namespace Raster {
             model.faces = faces;
 
             if (shader.has_value()) {
-                model.shader = std::dynamic_pointer_cast<Shader>(shader.value());
+                model.shader = shader.value();
             }
 
             return model;
