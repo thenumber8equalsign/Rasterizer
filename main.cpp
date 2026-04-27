@@ -54,31 +54,33 @@ int main() {
     whiteTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xffffff));
 
     Model greenTri(Transform({0, 5, 0}, 0, 90, 0));
-    greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt});
+    greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt, std::nullopt});
     greenTri.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0x00aa00));
 
     float cubeSize = 10;
     Model ground(Transform({0, -cubeSize, 0}, 0, 0, 0));
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
     ground.shader = std::dynamic_pointer_cast<Shader>(std::make_shared<SolidColourShader>(0xdddddd));
 
-    Model obj = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
-    obj.transform.position = {0, 2, 10};
-    obj.transform.setRotation(180, 0, 0);
+    Model monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
+    monkey.transform.position = {0, 2, 10};
+    monkey.transform.setRotation(180, 0, 0);
+    monkey.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    Model obj2 = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
-    obj2.transform.position = {-2, 3, -10};
+    Model objCube = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
+    objCube.transform.position = {-2, 3, -10};
+    objCube.shader = std::make_shared<SolidColourShader>(0xffffff);
 
     Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes.transform.position = {2, 2, 2};
@@ -92,9 +94,9 @@ int main() {
     scene.models.push_back(greenTri);// 3
     scene.models.push_back(ground);  // 4
     scene.models.push_back(spinTriT);// 5
-    scene.models.push_back(obj);
-    scene.models.push_back(obj2);
-    scene.models.push_back(axes);
+    scene.models.push_back(monkey);  // 6
+    scene.models.push_back(objCube); // 7
+    scene.models.push_back(axes);    // 8
     // scene.models.push_back(minecraft);
 
     bool run = true;
@@ -263,6 +265,21 @@ int main() {
                 c = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, c);
 
 
+                float3 nA = face.normals.value_or({a, float3_zero, float3_zero}).a;
+                float3 nB = face.normals.value_or({a, float3_zero, float3_zero}).b;
+                float3 nC = face.normals.value_or({a, float3_zero, float3_zero}).c;
+
+                // Rotate along the model's transform
+                nA = Transform::transformVector(ihat, jhat, khat, nA);
+                nB = Transform::transformVector(ihat, jhat, khat, nB);
+                nC = Transform::transformVector(ihat, jhat, khat, nC);
+
+                // Rotate along the inverse of the camera
+                nA = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nA);
+                nB = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nB);
+                nC = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nC);
+
+
                 auto projectedTriangle = project({a,b,c}, scene.camera, SCREEN_HEIGHT);
                 if (projectedTriangle.has_value()) {
                     const triangle3D& tri = projectedTriangle.value();
@@ -310,7 +327,7 @@ int main() {
                             float3 weight;
                             if (pointInTriangle(tri.a.dropZ(), tri.b.dropZ(), tri.c.dropZ(), p, &weight)) {
                                 float3 _depths = {tri.a.z, tri.b.z, tri.c.z};
-                                float depth = 1/dot3(1/_depths, weight);
+                                float depth = 1/float3::dot(1/_depths, weight);
 
                                 if (depth > depthBuffer[k][l]) continue;
                                 depthBuffer[k][l] = depth;
@@ -322,11 +339,18 @@ int main() {
                                     const float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
                                     const float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
 
-                                    uv.x = dot3(u,weight)*depth;
-                                    uv.y = dot3(v,weight)*depth;
+                                    uv.x = float3::dot(u,weight)*depth;
+                                    uv.y = float3::dot(v,weight)*depth;
                                 }
 
-                                uint32_t col = model.getColour(uv) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
+                                // To undo the perspective, we can divide by pixelsPerWorldUnit, and then multiply by the interpolated depth
+                                const float screenHeightUnits = 2*tanf(toRadians(scene.camera.fov/2));
+                                const float pixelsPerWorldUnit = SCREEN_HEIGHT / screenHeightUnits;
+
+                                float3 actualPoint{p.x/pixelsPerWorldUnit*depth, p.y/pixelsPerWorldUnit*depth, depth};
+                                actualPoint = actualPoint.normalize();
+
+                                uint32_t col = model.getColour(uv, actualPoint, nA.normalize(), face.normals.has_value()) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
 
                                 colourBuffer[k][l] = col;
                             }
