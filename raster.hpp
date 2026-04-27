@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
