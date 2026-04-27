@@ -80,6 +80,14 @@ namespace Raster {
             y-=other.y;
             return *this;
         }
+
+        static inline __attribute__((always_inline)) float2 perpendicular(const float2& a) {
+            return {-a.y, a.x};
+        }
+
+        static inline __attribute__((always_inline)) float dot(const float2& a, const float2& b) {
+            return a.x*b.x+a.y*b.y;
+        }
     };
     typedef struct float2 float2;
 
@@ -121,12 +129,22 @@ namespace Raster {
         inline __attribute__((always_inline)) float2 dropZ() const {
             return {x, y};
         }
+
+        inline __attribute__((always_inline)) float3 normalize() const {
+            const float mag = std::hypotf(x, std::hypotf(y, z));
+            return {x/mag, y/mag, z/mag};
+        }
+
+        static inline __attribute__((always_inline)) float dot(float3 a, float3 b) {
+            return a.x*b.x + a.y*b.y + a.z*b.z;
+        }
     };
     typedef struct float3 float3;
 
     constexpr float3 float3_forward{0,0,1};
     constexpr float3 float3_right{1,0,0};
     constexpr float3 float3_up{0,1,0};
+    constexpr float3 float3_zero{0,0,0};
 
     inline __attribute__((always_inline)) float3 operator*(float scalar, const float3& f3) {
         return {scalar*f3.x, scalar*f3.y, scalar*f3.z};
@@ -293,7 +311,9 @@ namespace Raster {
         public:
             // Sadly, my favourite words that you have seen throughout this header.hpp file on *literally* every single function will not apply
             // as the compiler can not inline this through a pointer to the base class
-            virtual uint32_t getColour(const float2&) const = 0;
+
+            // lightVector and normalVector must be unit vectors
+            virtual uint32_t getColour(const float2&, const float3&, const float3&, const bool) const = 0;
             virtual ~Shader() = default;
     };
 
@@ -301,8 +321,23 @@ namespace Raster {
         public:
             uint32_t colour;
             SolidColourShader(uint32_t colour) : colour(colour) {};
-            uint32_t getColour(const float2& UV) const override {
-                return colour;
+
+            uint32_t getColour(const float2& UV, const float3& lightVector, const float3& normalVector, const bool useLight) const override {
+                if (!useLight) return colour;
+
+                float brightness = std::abs(float3::dot(lightVector, normalVector));
+                if (brightness > 1) brightness = 1.0f;
+                if (brightness < 0) brightness = 0.0f;
+
+                brightness = brightness*0.5 + 0.5; // map it between [0.5,1]
+
+                const uint8_t r = (uint8_t)(((colour&0xff0000)>>16) * brightness);
+                const uint8_t g = (uint8_t)(((colour&0xff00)>>8) * brightness);
+                const uint8_t b = (uint8_t)((colour&0xff) * brightness);
+
+                const uint32_t col = (r << 16) | (g << 8) | b;
+
+                return col;
             }
     };
 
@@ -311,7 +346,7 @@ namespace Raster {
             TextureShader(const std::vector<uint32_t>& pixels, const uint32_t w, const uint32_t h) : pixels(pixels), width(w), height(h) {};
             TextureShader(const TextureShader& other) : TextureShader(other.pixels, other.width, other.height) {}
 
-            uint32_t getColour(const float2& UV) const override {
+            uint32_t getColour(const float2& UV, const float3& lightVector, const float3& normalVector, const bool useLight) const override {
                 float2 uv = UV;
 
                 if (uv.x > 1) uv.x = 1.0f;
@@ -326,7 +361,25 @@ namespace Raster {
                 if (y >= height) y = height-1;
                 if (x < 0) x = 0;
                 if (y < 0) y = 0;
-                return pixels.at(y*width+x);
+
+
+                if (!useLight) return pixels.at(y*width+x);
+
+                const uint32_t col = pixels.at(y*width+x);
+
+                float brightness = std::abs(float3::dot(lightVector, normalVector));
+                if (brightness > 1) brightness = 1.0f;
+                if (brightness < 0) brightness = 0.0f;
+
+                brightness = brightness*0.5 + 0.5; // map it between [0.5,1]
+
+                const uint8_t r = (uint8_t)(((col&0xff0000)>>16) * brightness);
+                const uint8_t g = (uint8_t)(((col&0xff00)>>8) * brightness);
+                const uint8_t b = (uint8_t)((col&0xff) * brightness);
+
+                const uint32_t lightCol = (r << 16) | (g << 8) | b;
+
+                return lightCol;
             }
 
             static inline __attribute__((always_inline)) TextureShader loadFromFile(const std::string& path) {
@@ -415,12 +468,11 @@ namespace Raster {
             Transform transform;
             std::shared_ptr<Shader> shader = nullptr;
             std::vector<Face> faces;
-            inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const uint32_t col=0xe6a000) {
+            inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const float3& lightVector, const float3& normalVector, const bool useLight) {
                 if (!shader) {
-                    return col; // temporary for migrating from the per-face colour to new shader system (for some reason try catch is EXTREMELY expensive so this is easier)
                     throw std::runtime_error("Null shader pointer");
                 }
-                return shader->getColour(uv);
+                return shader->getColour(uv, lightVector, normalVector, useLight);
             }
             static inline __attribute__((always_inline)) Model fromOBJ(const std::string&, const std::string&);
     };
@@ -440,21 +492,10 @@ namespace Raster {
             Camera camera;
     };
 
-    inline __attribute__((always_inline)) float dot2(const float2& a, const float2& b) {
-        return a.x*b.x+a.y*b.y;
-    }
-    inline __attribute__((always_inline)) float dot3(const float3& a, const float3& b) {
-        return a.x*b.x + a.y*b.y + a.z*b.z;
-    }
-
-    inline __attribute__((always_inline)) float2 perpendicular(const float2& a) {
-        return {-a.y, a.x};
-    }
-
     inline __attribute__((always_inline)) float signedTriangleArea(const float2& a, const float2& b, const float2& c) {
         const float2 ac = c - a;
-        const float2 abPerp = perpendicular(b - a);
-        return dot2(ac, abPerp);
+        const float2 abPerp = float2::perpendicular(b - a);
+        return float2::dot(ac, abPerp);
     }
 
     inline __attribute__((always_inline)) float absf(float a) {return a<0?-a:a;}
@@ -586,7 +627,7 @@ namespace Raster {
                     v.x = std::stof(values[1]);
                     v.y = std::stof(values[2]);
                     v.z = std::stof(values[3]);
-                    normals.push_back(v);
+                    normals.push_back(v.normalize()); // make it a unit vector, since it may not be a unit vector in the obj file
                 }
             }
 
