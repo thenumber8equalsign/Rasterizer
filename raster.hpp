@@ -477,7 +477,6 @@ namespace Raster {
     }
 
 
-    // TODO: instead of rejecting triangles with any point behind the camera outride, split the triangle into other triangles that are all in front of the camera
     inline __attribute__((always_inline)) std::optional<triangle3D> project(triangle3D tri, const Camera& camera, const int screenHeightPixels, const bool& debug = false) {
         // p should be relative to the camera, and all transformations should already be applied
         if (tri.a.z <= camera.nearClip || tri.b.z <= camera.nearClip || tri.c.z <= camera.nearClip) {
@@ -551,7 +550,6 @@ namespace Raster {
                     // we expect points to be a 4, or 5 dimensional vector (since the leading v is included), all containing floats
                     if (values.size() != 4 && values.size() != 5) throw std::exception();
 
-                    // TODO: implement the scaling factor of w in verticies (x/w, y/w, z/w)
                     float3 v;
                     v.x = std::stof(values[1]);
                     v.y = std::stof(values[2]);
@@ -588,7 +586,6 @@ namespace Raster {
                         slashSeperated.push_back(split(spaceSeperated.at(j), "/"));
                     }
 
-                    // TODO: Triangulate non-triangles (convex only, concave at a MUCH later date)
                     if (slashSeperated.size() != 3) {
                         throw std::exception();
                     }
