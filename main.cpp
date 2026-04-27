@@ -85,6 +85,10 @@ int main() {
     Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes.transform.position = {2, 2, 2};
 
+    Model sphere = Model::fromOBJ(exeDir.string() + "resources/sphere.obj");
+    sphere.transform.position = {-10, 0, 10};
+    sphere.shader = std::make_shared<SolidColourShader>(0xdddddd);
+
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
     // minecraft.transform.position = {-2, 2, 2};
 
@@ -97,6 +101,7 @@ int main() {
     scene.models.push_back(monkey);  // 6
     scene.models.push_back(objCube); // 7
     scene.models.push_back(axes);    // 8
+    scene.models.push_back(sphere);  // 9
     // scene.models.push_back(minecraft);
 
     bool run = true;
