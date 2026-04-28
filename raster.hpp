@@ -181,19 +181,20 @@ namespace Raster {
     class Transform {
         public:
             Transform(const float3& pos, const float yaw, const float pitch, const float roll);
+            Transform(const float3& pos, const float yaw, const float pitch, const float roll, const Transform *parent);
             inline __attribute__((always_inline)) void updateBasisVectors();
-            inline __attribute((always_inline)) void fetchBasisVectors(float3* ihat, float3* jhat, float3* khat) {
+            inline __attribute((always_inline)) void fetchBasisVectors(float3* ihat, float3* jhat, float3* khat) const {
                 *ihat = this->iHat;
                 *jhat = this->jHat;
                 *khat = this->kHat;
             }
-            inline __attribute__((always_inline)) void fetchInverseBasisVectors(float3* ihat, float3* jhat, float3* khat) {
+            inline __attribute__((always_inline)) void fetchInverseBasisVectors(float3* ihat, float3* jhat, float3* khat) const {
                 *ihat = this->iHatInv;
                 *jhat = this->jHatInv;
                 *khat = this->kHatInv;
             }
 
-            Transform* parent = nullptr;
+            const Transform *parent;
             float3 position;
 
             inline __attribute__((always_inline)) void setYaw(float yaw);
@@ -210,7 +211,39 @@ namespace Raster {
             inline __attribute__((always_inline)) float getPitch() {return toDegrees(pitch);};
             inline __attribute__((always_inline)) float getRoll() {return toDegrees(roll);};
 
-            inline __attribute__((always_inline)) static float3 transformVector(const float3& iHat, const float3& jHat, const float3& kHat, const float3& v) {
+            void fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
+                if (parent && this != parent) {
+                    float3 iP, jP, kP;
+                    parent->fetchBasisVectorsRecursive(&iP, &jP, &kP);
+                    *i = transformVector(iP, jP, kP, iHat);
+                    *j = transformVector(iP, jP, kP, jHat);
+                    *k = transformVector(iP, jP, kP, kHat);
+                } else {
+                    fetchBasisVectors(i, j, k);
+                }
+            }
+
+            float3 getAbsolutePosition() const {
+                if (parent && this != parent) {
+                    const float3 parentPos = parent->getAbsolutePosition();
+
+                    float3 parentIHat;
+                    float3 parentJHat;
+                    float3 parentKHat;
+
+                    parent->fetchBasisVectorsRecursive(&parentIHat, &parentJHat, &parentKHat);
+
+
+                    const float3 rotatedPosition = transformVector(parentIHat, parentJHat, parentKHat, position);
+
+
+                    return rotatedPosition + parentPos;
+                }
+
+                return position;
+            }
+
+            static inline __attribute__((always_inline)) float3 transformVector(const float3& iHat, const float3& jHat, const float3& kHat, const float3& v) {
                 return v.x * iHat + v.y * jHat + v.z * kHat;
             }
         private:
@@ -225,8 +258,14 @@ namespace Raster {
 
     Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll) {
         this->position = pos;
+        this->parent = nullptr;
         setRotation(yaw, pitch, roll);
         updateBasisVectors();
+    }
+
+    Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll, const Transform *parent) {
+        this->parent = parent;
+        Transform(pos, yaw, pitch, roll);
     }
 
     inline __attribute__((always_inline)) void Transform::setRotation(float yaw, float pitch, float roll) {
