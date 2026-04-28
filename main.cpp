@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "raster.hpp"
+#include <SDL2/SDL_scancode.h>
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -138,6 +139,8 @@ int main() {
         return EXIT_FAILURE;
     }
 
+
+    bool doAnimations = true;
     while (run) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -157,6 +160,8 @@ int main() {
                     case SDL_SCANCODE_RIGHT: lrud |= (1<<2); break;
                     case SDL_SCANCODE_UP: lrud |= (1<<1); break;
                     case SDL_SCANCODE_DOWN: lrud |= (1<<0); break;
+                    // Toggle the animations
+                    case SDL_SCANCODE_SPACE: doAnimations = !doAnimations; break;
                     default: break;
                 }
             } else if (e.type == SDL_KEYUP) {
@@ -182,47 +187,50 @@ int main() {
         newTime = chrono::high_resolution_clock::now();
         float deltaTime = chrono::duration<float>(newTime-oldTime).count();
         oldTime = newTime;
-        scene.models[0].transform.incYaw(270.0f*deltaTime);
-        scene.models[4].transform.incYaw(45.0f*deltaTime);
-        scene.models[5].transform.incYaw(180.0f*deltaTime);
-        scene.models[3].transform.incRoll(30.0f*deltaTime);
-        scene.models[3].transform.incPitch(30.0f*deltaTime);
-        scene.models[8].transform.incYaw(60.0f*deltaTime);
-        scene.models[8].transform.incPitch(60.0f*deltaTime);
-        scene.models[8].transform.incRoll(60.0f*deltaTime);
-        scene.models[9].transform.incYaw(60.0f*deltaTime);
-        scene.models[6].transform.incYaw(60.0f*deltaTime);
 
-        if (scene.models[3].transform.position.y > 15) {
-            greenTriMoveUp = false;
-        } else if (scene.models[3].transform.position.y < 5) {
-            greenTriMoveUp = true;
-        }
+        if (doAnimations) {
+            scene.models[0].transform.incYaw(270.0f*deltaTime);
+            scene.models[4].transform.incYaw(45.0f*deltaTime);
+            scene.models[5].transform.incYaw(180.0f*deltaTime);
+            scene.models[3].transform.incRoll(30.0f*deltaTime);
+            scene.models[3].transform.incPitch(30.0f*deltaTime);
+            scene.models[8].transform.incYaw(60.0f*deltaTime);
+            scene.models[8].transform.incPitch(60.0f*deltaTime);
+            scene.models[8].transform.incRoll(60.0f*deltaTime);
+            scene.models[9].transform.incYaw(60.0f*deltaTime);
+            scene.models[6].transform.incYaw(60.0f*deltaTime);
 
-        scene.models[3].transform.position.y += (greenTriMoveUp ? 1 : -1)*deltaTime*5;
+            if (scene.models[3].transform.position.y > 15) {
+                greenTriMoveUp = false;
+            } else if (scene.models[3].transform.position.y < 5) {
+                greenTriMoveUp = true;
+            }
 
-        if (pinkTriState == 0) {
-            scene.models[1].transform.incYaw(15.0f*deltaTime);
-            if (scene.models[1].transform.getYaw() >= 135.0f) {
-                scene.models[1].transform.setYaw(135.0f);
-                ++pinkTriState;
+            scene.models[3].transform.position.y += (greenTriMoveUp ? 1 : -1)*deltaTime*5;
+
+            if (pinkTriState == 0) {
+                scene.models[1].transform.incYaw(15.0f*deltaTime);
+                if (scene.models[1].transform.getYaw() >= 135.0f) {
+                    scene.models[1].transform.setYaw(135.0f);
+                    ++pinkTriState;
+                }
+            } else if (pinkTriState == 1) {
+                scene.models[1].transform.incPitch(15.0f*deltaTime);
+                if (scene.models[1].transform.getPitch() >= 70.0f) {
+                    scene.models[1].transform.setPitch(70.0f);
+                    ++pinkTriState;
+                }
+            } else if (pinkTriState == 2) {
+                scene.models[1].transform.incRoll(15.0f*deltaTime);
+                if (scene.models[1].transform.getRoll() >= 90.0f) {
+                    scene.models[1].transform.setRoll(90.0f);
+                    ++pinkTriState;
+                    pinkTriEnd = chrono::high_resolution_clock::now();
+                }
+            } else if (pinkTriState == 3 && chrono::duration<float>(newTime-pinkTriEnd).count() >= 5.0f) {
+                scene.models[1].transform.setRotation(0, 0, 0);
+                pinkTriState = 0;
             }
-        } else if (pinkTriState == 1) {
-            scene.models[1].transform.incPitch(15.0f*deltaTime);
-            if (scene.models[1].transform.getPitch() >= 70.0f) {
-                scene.models[1].transform.setPitch(70.0f);
-                ++pinkTriState;
-            }
-        } else if (pinkTriState == 2) {
-            scene.models[1].transform.incRoll(15.0f*deltaTime);
-            if (scene.models[1].transform.getRoll() >= 90.0f) {
-                scene.models[1].transform.setRoll(90.0f);
-                ++pinkTriState;
-                pinkTriEnd = chrono::high_resolution_clock::now();
-            }
-        } else if (pinkTriState == 3 && chrono::duration<float>(newTime-pinkTriEnd).count() >= 5.0f) {
-            scene.models[1].transform.setRotation(0, 0, 0);
-            pinkTriState = 0;
         }
 
 
