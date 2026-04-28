@@ -78,7 +78,7 @@ int main() {
     monkey.transform.setRotation(180, 0, 0);
     monkey.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    Model objCube = Model::fromOBJ(exeDir.string() + "resources/cubeWithTexture.obj", exeDir.string() + "resources/grid.bin");
+    Model objCube = Model::fromOBJ(exeDir.string() + "resources/Nefertitiobj.obj");
     objCube.transform.position = {-2, 3, -10};
     objCube.shader = std::make_shared<SolidColourShader>(0xffffff);
 
@@ -191,6 +191,8 @@ int main() {
         scene.models[8].transform.incPitch(60.0f*deltaTime);
         scene.models[8].transform.incRoll(60.0f*deltaTime);
         scene.models[9].transform.incYaw(60.0f*deltaTime);
+        scene.models[9].transform.incPitch(60.0f*deltaTime);
+        scene.models[9].transform.incRoll(60.0f*deltaTime);
         scene.models[6].transform.incYaw(60.0f*deltaTime);
 
         if (scene.models[3].transform.position.y > 15) {
