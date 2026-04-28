@@ -181,7 +181,7 @@ namespace Raster {
     class Transform {
         public:
             Transform(const float3& pos, const float yaw, const float pitch, const float roll);
-            Transform(const float3& pos, const float yaw, const float pitch, const float roll, std::weak_ptr<Transform> parent);
+            Transform(const float3& pos, const float yaw, const float pitch, const float roll, const std::weak_ptr<Transform> parent);
             inline __attribute__((always_inline)) void updateBasisVectors();
             inline __attribute((always_inline)) void fetchBasisVectors(float3* ihat, float3* jhat, float3* khat) const {
                 *ihat = this->iHat;
@@ -265,9 +265,8 @@ namespace Raster {
         updateBasisVectors();
     }
 
-    Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll, const std::weak_ptr<Transform> parent) {
+    Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll, const std::weak_ptr<Transform> parent) : Transform(pos, yaw, pitch, roll) {
         this->parent = parent;
-        Transform(pos, yaw, pitch, roll);
     }
 
     inline __attribute__((always_inline)) void Transform::setRotation(float yaw, float pitch, float roll) {
