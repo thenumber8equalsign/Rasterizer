@@ -181,7 +181,7 @@ namespace Raster {
     class Transform {
         public:
             Transform(const float3& pos, const float yaw, const float pitch, const float roll);
-            Transform(const float3& pos, const float yaw, const float pitch, const float roll, const Transform *parent);
+            Transform(const float3& pos, const float yaw, const float pitch, const float roll, std::weak_ptr<Transform> parent);
             inline __attribute__((always_inline)) void updateBasisVectors();
             inline __attribute((always_inline)) void fetchBasisVectors(float3* ihat, float3* jhat, float3* khat) const {
                 *ihat = this->iHat;
@@ -194,7 +194,7 @@ namespace Raster {
                 *khat = this->kHatInv;
             }
 
-            const Transform *parent;
+            std::weak_ptr<Transform> parent;
             float3 position;
 
             inline __attribute__((always_inline)) void setYaw(float yaw);
@@ -212,9 +212,10 @@ namespace Raster {
             inline __attribute__((always_inline)) float getRoll() {return toDegrees(roll);};
 
             void fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
-                if (parent && this != parent) {
+                auto par = parent.lock();
+                if (par && this != par.get()) {
                     float3 iP, jP, kP;
-                    parent->fetchBasisVectorsRecursive(&iP, &jP, &kP);
+                    par->fetchBasisVectorsRecursive(&iP, &jP, &kP);
                     *i = transformVector(iP, jP, kP, iHat);
                     *j = transformVector(iP, jP, kP, jHat);
                     *k = transformVector(iP, jP, kP, kHat);
@@ -224,14 +225,15 @@ namespace Raster {
             }
 
             float3 getAbsolutePosition() const {
-                if (parent && this != parent) {
-                    const float3 parentPos = parent->getAbsolutePosition();
+                auto par = parent.lock();
+                if (par && this != par.get()) {
+                    const float3 parentPos = par->getAbsolutePosition();
 
                     float3 parentIHat;
                     float3 parentJHat;
                     float3 parentKHat;
 
-                    parent->fetchBasisVectorsRecursive(&parentIHat, &parentJHat, &parentKHat);
+                    par->fetchBasisVectorsRecursive(&parentIHat, &parentJHat, &parentKHat);
 
 
                     const float3 rotatedPosition = transformVector(parentIHat, parentJHat, parentKHat, position);
@@ -258,12 +260,12 @@ namespace Raster {
 
     Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll) {
         this->position = pos;
-        this->parent = nullptr;
+        this->parent = std::weak_ptr<Transform>();
         setRotation(yaw, pitch, roll);
         updateBasisVectors();
     }
 
-    Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll, const Transform *parent) {
+    Transform::Transform(const float3& pos, const float yaw, const float pitch, const float roll, const std::weak_ptr<Transform> parent) {
         this->parent = parent;
         Transform(pos, yaw, pitch, roll);
     }
@@ -522,17 +524,17 @@ namespace Raster {
 
     class Model {
         public:
-            Model(Transform t) : transform(t) {};
-            Transform transform;
+            Model(std::shared_ptr<Transform> t) : transform(t) {};
+            std::shared_ptr<Transform> transform;
             std::shared_ptr<Shader> shader = nullptr;
             std::vector<Face> faces;
-            inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const float3& lightVector, const float3& normalVector, const bool useLight) {
+            inline __attribute__((always_inline)) uint32_t getColour(const float2& uv, const float3& lightVector, const float3& normalVector, const bool useLight) const {
                 if (!shader) {
                     throw std::runtime_error("Null shader pointer");
                 }
                 return shader->getColour(uv, lightVector, normalVector, useLight);
             }
-            static inline __attribute__((always_inline)) Model fromOBJ(const std::string&, const std::string&);
+            static inline __attribute__((always_inline)) std::shared_ptr<Model> fromOBJ(const std::string&, const std::string&);
     };
 
     class Camera {
@@ -546,7 +548,7 @@ namespace Raster {
     class Scene {
         public:
             Scene(Camera cam) : camera(cam) {};
-            std::vector<Model> models;
+            std::vector<std::shared_ptr<Model>> models;
             Camera camera;
     };
 
@@ -622,7 +624,7 @@ namespace Raster {
 
     // Read from OBJ files
     // When exporting from blender, one must first mirror everything along y, then export with default settings (-z as forward and y as up)
-    inline __attribute__((always_inline)) Model Model::fromOBJ(const std::string& objName, const std::string& texFile = "") {
+    inline __attribute__((always_inline)) std::shared_ptr<Model> Model::fromOBJ(const std::string& objName, const std::string& texFile = "") {
         std::ifstream file(objName.c_str());
         if (!file.is_open()) throw std::runtime_error("Could not open file");
 
@@ -731,12 +733,12 @@ namespace Raster {
             }
 
             // create a vector of triangle3D now to go with our model
-            Model model(Transform({0,0,0},0,0,0)); // use a default transform, the caller can change this later
+            std::shared_ptr<Model> model = std::make_shared<Model>(std::make_shared<Transform>(Transform({0,0,0},0,0,0))); // use a default transform, the caller can change this later
 
-            model.faces = faces;
+            model->faces = faces;
 
             if (shader.has_value()) {
-                model.shader = shader.value();
+                model->shader = shader.value();
             }
 
             return model;

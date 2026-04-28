@@ -38,54 +38,63 @@ int main() {
     Scene scene(Camera(Transform({0, 0, 0}, 0, 0, 0)));
 
     // create a triangle
-    Model spinTri(Transform({0, 1, 0}, 0, 0, 0));
-    spinTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    spinTri.shader = std::make_shared<SolidColourShader>(0xe6a000);
+    shared_ptr<Model> spinTri = make_shared<Model>(make_shared<Transform>(Transform({0, 1, 0}, 0, 0, 0)));
+    spinTri->faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
+    spinTri->shader = std::make_shared<SolidColourShader>(0xe6a000);
 
-    Model spinTriT(Transform({0, 1, 0}, 90, 0, 0));
-    spinTriT.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    spinTriT.shader = std::make_shared<SolidColourShader>(0xe6a0ff);
+    shared_ptr<Model> spinTriT = make_shared<Model>(make_shared<Transform>(Transform({0, 1, 0}, 90, 0, 0)));
+    spinTriT->faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
+    spinTriT->shader = std::make_shared<SolidColourShader>(0xe6a0ff);
 
-    Model pinkTri(Transform({5.0f, 1, 5.0f}, 0, 0, 0));
-    pinkTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    pinkTri.shader = std::make_shared<SolidColourShader>(0xe6a0ff);
+    shared_ptr<Model> pinkTri = make_shared<Model>(make_shared<Transform>(Transform({5.0f, 1, 5.0f}, 0, 0, 0)));
+    pinkTri->faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
+    pinkTri->shader = std::make_shared<SolidColourShader>(0xe6a0ff);
 
-    Model whiteTri(Transform({-5.0f, 1, -5.0f}, 0, 0, 0));
-    whiteTri.faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
-    whiteTri.shader = std::make_shared<SolidColourShader>(0xffffff);
+    shared_ptr<Model> whiteTri = make_shared<Model>(make_shared<Transform>(Transform({-5.0f, 1, -5.0f}, 0, 0, 0)));
+    whiteTri->faces.push_back({{{-1, -1, 0}, {0, 1, 0}, {1, -1, 0}}, std::nullopt, std::nullopt});
+    whiteTri->shader = std::make_shared<SolidColourShader>(0xffffff);
 
-    Model greenTri(Transform({0, 5, 0}, 0, 90, 0));
-    greenTri.faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt, std::nullopt});
-    greenTri.shader = std::make_shared<SolidColourShader>(0x00aa00);
+    shared_ptr<Model> greenTri = make_shared<Model>(make_shared<Transform>(Transform({0, 5, 0}, 0, 90, 0)));
+    greenTri->faces.push_back({{{-1, -1, 0},{0, 1, 0},{1, -1, 0}}, std::nullopt, std::nullopt});
+    greenTri->shader = std::make_shared<SolidColourShader>(0x00aa00);
 
     float cubeSize = 10;
-    Model ground(Transform({0, -cubeSize, 0}, 0, 0, 0));
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground.faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground.shader = std::make_shared<SolidColourShader>(0xdddddd);
+    shared_ptr<Model> ground = make_shared<Model>(make_shared<Transform>(Transform({0, -cubeSize, 0}, 0, 0, 0)));
+    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
+    ground->faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
+    ground->shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    Model monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
-    monkey.transform.position = {0, 2, 10};
-    monkey.transform.setRotation(180, 0, 0);
-    monkey.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    Model objCube = Model::fromOBJ(exeDir.string() + "resources/Nefertitiobj.obj");
-    objCube.transform.position = {-2, 3, -10};
-    objCube.shader = std::make_shared<SolidColourShader>(0xffffff);
+    shared_ptr<Model> monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
+    monkey->transform->position = {0, 2, 10};
+    monkey->transform->setRotation(180, 0, 0);
+    monkey->shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes.transform.position = {2, 2, 2};
+    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/Nefertitiobj.obj");
+    objCube->transform->position = {-2, 3, -10};
+    objCube->shader = std::make_shared<SolidColourShader>(0xffffff);
 
+    shared_ptr<Model> axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes->transform->position = {2, 2, 2};
+
+    shared_ptr<Model> axes2 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes2->transform->position = {0,0,3};
+    axes2->transform->parent = axes->transform;
+
+    shared_ptr<Model> sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
+    sphere->transform->position = {0,0,3};
+    sphere->shader = make_shared<SolidColourShader>(0xdddddd);
+    sphere->transform->parent = axes2->transform;
 
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
     // minecraft.transform.position = {-2, 2, 2};
@@ -99,20 +108,9 @@ int main() {
     scene.models.push_back(monkey);  // 6
     scene.models.push_back(objCube); // 7
     scene.models.push_back(axes);    // 8
-    // scene.models.push_back(minecraft);
-
-    Model axes2 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes2.transform.position = {0,0,3};
-    axes2.transform.setRotation(45, 0, 0);
-    axes2.transform.parent = &scene.models[8].transform;
     scene.models.push_back(axes2);
-
-    Model sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
-    sphere.transform.position = {0, 0, 3};
-    sphere.shader = std::make_shared<SolidColourShader>(0xdddddd);
-
-    sphere.transform.parent = &scene.models[9].transform;
-    scene.models.push_back(sphere);  // 9
+    scene.models.push_back(sphere);
+    // scene.models.push_back(minecraft);
 
     bool run = true;
     uint8_t wasdqe = 0b000000;
@@ -189,46 +187,46 @@ int main() {
         oldTime = newTime;
 
         if (doAnimations) {
-            scene.models[0].transform.incYaw(270.0f*deltaTime);
-            scene.models[4].transform.incYaw(45.0f*deltaTime);
-            scene.models[5].transform.incYaw(180.0f*deltaTime);
-            scene.models[3].transform.incRoll(30.0f*deltaTime);
-            scene.models[3].transform.incPitch(30.0f*deltaTime);
-            scene.models[8].transform.incYaw(60.0f*deltaTime);
-            scene.models[8].transform.incPitch(60.0f*deltaTime);
-            scene.models[8].transform.incRoll(60.0f*deltaTime);
-            scene.models[9].transform.incYaw(60.0f*deltaTime);
-            scene.models[6].transform.incYaw(60.0f*deltaTime);
+            scene.models[0]->transform->incYaw(270.0f*deltaTime);
+            scene.models[4]->transform->incYaw(45.0f*deltaTime);
+            scene.models[5]->transform->incYaw(180.0f*deltaTime);
+            scene.models[3]->transform->incRoll(30.0f*deltaTime);
+            scene.models[3]->transform->incPitch(30.0f*deltaTime);
+            scene.models[8]->transform->incYaw(60.0f*deltaTime);
+            scene.models[8]->transform->incPitch(60.0f*deltaTime);
+            scene.models[8]->transform->incRoll(60.0f*deltaTime);
+            scene.models[9]->transform->incYaw(60.0f*deltaTime);
+            scene.models[6]->transform->incYaw(60.0f*deltaTime);
 
-            if (scene.models[3].transform.position.y > 15) {
+            if (scene.models[3]->transform->position.y > 15) {
                 greenTriMoveUp = false;
-            } else if (scene.models[3].transform.position.y < 5) {
+            } else if (scene.models[3]->transform->position.y < 5) {
                 greenTriMoveUp = true;
             }
 
-            scene.models[3].transform.position.y += (greenTriMoveUp ? 1 : -1)*deltaTime*5;
+            scene.models[3]->transform->position.y += (greenTriMoveUp ? 1 : -1)*deltaTime*5;
 
             if (pinkTriState == 0) {
-                scene.models[1].transform.incYaw(15.0f*deltaTime);
-                if (scene.models[1].transform.getYaw() >= 135.0f) {
-                    scene.models[1].transform.setYaw(135.0f);
+                scene.models[1]->transform->incYaw(15.0f*deltaTime);
+                if (scene.models[1]->transform->getYaw() >= 135.0f) {
+                    scene.models[1]->transform->setYaw(135.0f);
                     ++pinkTriState;
                 }
             } else if (pinkTriState == 1) {
-                scene.models[1].transform.incPitch(15.0f*deltaTime);
-                if (scene.models[1].transform.getPitch() >= 70.0f) {
-                    scene.models[1].transform.setPitch(70.0f);
+                scene.models[1]->transform->incPitch(15.0f*deltaTime);
+                if (scene.models[1]->transform->getPitch() >= 70.0f) {
+                    scene.models[1]->transform->setPitch(70.0f);
                     ++pinkTriState;
                 }
             } else if (pinkTriState == 2) {
-                scene.models[1].transform.incRoll(15.0f*deltaTime);
-                if (scene.models[1].transform.getRoll() >= 90.0f) {
-                    scene.models[1].transform.setRoll(90.0f);
+                scene.models[1]->transform->incRoll(15.0f*deltaTime);
+                if (scene.models[1]->transform->getRoll() >= 90.0f) {
+                    scene.models[1]->transform->setRoll(90.0f);
                     ++pinkTriState;
                     pinkTriEnd = chrono::high_resolution_clock::now();
                 }
             } else if (pinkTriState == 3 && chrono::duration<float>(newTime-pinkTriEnd).count() >= 5.0f) {
-                scene.models[1].transform.setRotation(0, 0, 0);
+                scene.models[1]->transform->setRotation(0, 0, 0);
                 pinkTriState = 0;
             }
         }
@@ -258,13 +256,13 @@ int main() {
         }
 
         for (int i = 0; i < scene.models.size(); ++i) {
-            Model& model = scene.models[i];
+            const auto model = scene.models[i];
             float3 ihat, jhat, khat;
-            model.transform.fetchBasisVectorsRecursive(&ihat, &jhat, &khat);
+            model->transform->fetchBasisVectorsRecursive(&ihat, &jhat, &khat);
 
 
-            for (int j = 0; j < model.faces.size(); ++j) {
-                const Face& face = model.faces[j];
+            for (int j = 0; j < model->faces.size(); ++j) {
+                const Face& face = model->faces[j];
                 // compute the new verticies of face based on the transformations in model.transform
                 // make point relative to camera, then rotate according to camera rotations (do later)
                 // compute the bounding box of each triangle, and test if a pixel is in the triangle
@@ -278,7 +276,7 @@ int main() {
                 b = Transform::transformVector(ihat, jhat, khat, b);
                 c = Transform::transformVector(ihat, jhat, khat, c);
 
-                const float3 pos = model.transform.getAbsolutePosition();
+                const float3 pos = model->transform->getAbsolutePosition();
                 // Add the model's position
                 a += pos;
                 b += pos;
@@ -380,7 +378,7 @@ int main() {
                                 float3 actualPoint{p.x/pixelsPerWorldUnit*depth, p.y/pixelsPerWorldUnit*depth, depth};
                                 actualPoint = actualPoint.normalize();
 
-                                uint32_t col = model.getColour(uv, actualPoint, nA.normalize(), face.normals.has_value()) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
+                                uint32_t col = model->getColour(uv, actualPoint, nA.normalize(), face.normals.has_value()) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
 
                                 colourBuffer[k][l] = col;
                             }
