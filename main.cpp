@@ -85,9 +85,6 @@ int main() {
     Model axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes.transform.position = {2, 2, 2};
 
-    Model sphere = Model::fromOBJ(exeDir.string() + "resources/sphere.obj");
-    sphere.transform.position = {-10, 2, 10};
-    sphere.shader = std::make_shared<SolidColourShader>(0xdddddd);
 
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
     // minecraft.transform.position = {-2, 2, 2};
@@ -101,8 +98,20 @@ int main() {
     scene.models.push_back(monkey);  // 6
     scene.models.push_back(objCube); // 7
     scene.models.push_back(axes);    // 8
-    scene.models.push_back(sphere);  // 9
     // scene.models.push_back(minecraft);
+
+    Model axes2 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes2.transform.position = {0,0,3};
+    axes2.transform.setRotation(45, 0, 0);
+    axes2.transform.parent = &scene.models[8].transform;
+    scene.models.push_back(axes2);
+
+    Model sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
+    sphere.transform.position = {0, 0, 3};
+    sphere.shader = std::make_shared<SolidColourShader>(0xdddddd);
+
+    sphere.transform.parent = &scene.models[9].transform;
+    scene.models.push_back(sphere);  // 9
 
     bool run = true;
     uint8_t wasdqe = 0b000000;
@@ -178,9 +187,9 @@ int main() {
         scene.models[5].transform.incYaw(180.0f*deltaTime);
         scene.models[3].transform.incRoll(30.0f*deltaTime);
         scene.models[3].transform.incPitch(30.0f*deltaTime);
-        scene.models[6].transform.incYaw(60.0f*deltaTime);
-        scene.models[6].transform.incPitch(60.0f*deltaTime);
-        scene.models[6].transform.incRoll(60.0f*deltaTime);
+        scene.models[8].transform.incYaw(60.0f*deltaTime);
+        scene.models[8].transform.incPitch(60.0f*deltaTime);
+        scene.models[8].transform.incRoll(60.0f*deltaTime);
 
         if (scene.models[3].transform.position.y > 15) {
             greenTriMoveUp = false;
@@ -241,7 +250,9 @@ int main() {
         for (int i = 0; i < scene.models.size(); ++i) {
             Model& model = scene.models[i];
             float3 ihat, jhat, khat;
-            model.transform.fetchBasisVectors(&ihat, &jhat, &khat);
+            model.transform.fetchBasisVectorsRecursive(&ihat, &jhat, &khat);
+
+
             for (int j = 0; j < model.faces.size(); ++j) {
                 const Face& face = model.faces[j];
                 // compute the new verticies of face based on the transformations in model.transform
@@ -257,10 +268,11 @@ int main() {
                 b = Transform::transformVector(ihat, jhat, khat, b);
                 c = Transform::transformVector(ihat, jhat, khat, c);
 
+                const float3 pos = model.transform.getAbsolutePosition();
                 // Add the model's position
-                a += model.transform.position;
-                b += model.transform.position;
-                c += model.transform.position;
+                a += pos;
+                b += pos;
+                c += pos;
 
                 // Now make it relative to the camera
                 a -= scene.camera.transform.position;
