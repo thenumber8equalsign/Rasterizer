@@ -190,6 +190,8 @@ int main() {
         scene.models[8].transform.incYaw(60.0f*deltaTime);
         scene.models[8].transform.incPitch(60.0f*deltaTime);
         scene.models[8].transform.incRoll(60.0f*deltaTime);
+        scene.models[9].transform.incYaw(60.0f*deltaTime);
+        scene.models[6].transform.incYaw(60.0f*deltaTime);
 
         if (scene.models[3].transform.position.y > 15) {
             greenTriMoveUp = false;
