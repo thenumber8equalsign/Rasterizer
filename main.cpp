@@ -67,7 +67,7 @@ int main() {
     monkey->transform->position = {0, 2, 10};
     monkey->transform->setRotation(180, 0, 0);
 
-    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/smooth.obj", 0xffffff);
+    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/sphereSmooth.obj", 0xffffff);
     objCube->transform->position = {-2, 3, -10};
 
     shared_ptr<Model> axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
