@@ -80,12 +80,12 @@ int main() {
     monkey->transform->setRotation(180, 0, 0);
     monkey->shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/Nefertitiobj.obj");
+    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
     objCube->transform->position = {-2, 3, -10};
     objCube->shader = std::make_shared<SolidColourShader>(0xffffff);
 
     shared_ptr<Model> axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes->transform->position = {2, 2, 2};
+    axes->transform->position = {2, 10, 2};
 
     shared_ptr<Model> axes2 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes2->transform->position = {0,0,3};
@@ -395,7 +395,7 @@ int main() {
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
-        // cout << 1/deltaTime << endl;
+        cout << 1/deltaTime << endl;
     }
 
     SDL_DestroyWindow(window);

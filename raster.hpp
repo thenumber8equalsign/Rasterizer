@@ -211,7 +211,7 @@ namespace Raster {
             inline __attribute__((always_inline)) float getPitch() {return toDegrees(pitch);};
             inline __attribute__((always_inline)) float getRoll() {return toDegrees(roll);};
 
-            std::vector<std::pair<triangle3D, float3>> fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
+            inline __attribute__((always_inline)) std::vector<std::pair<triangle3D, float3>> fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
                 // Find all the basis vectors of all the parents by looping, then apply them in reverse order (closest to root node to the youngest)
 
                 auto curParent = parent.lock();
@@ -251,7 +251,7 @@ namespace Raster {
                 return basisVectorsOfParents;
             }
 
-            float3 getAbsolutePosition() const {
+            inline __attribute__((always_inline)) float3 getAbsolutePosition() const {
                 auto curParrent = parent.lock();
                 auto parentBasisVectors = fetchBasisVectorsRecursive(nullptr, nullptr, nullptr);
                 // create a new vector of the applied parent basis vectors in reverse order
