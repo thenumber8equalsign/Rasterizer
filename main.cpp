@@ -63,33 +63,45 @@ int main() {
     ground->transform->position = {0,-cubeSize,0};
     ground->transform->scale = {cubeSize,cubeSize,cubeSize};
 
-    shared_ptr<Model> monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", 0xdddddd);
+    shared_ptr<Model> monkey = Model::fromOBJ(exeDir.string() + "resources/monkeySmooth.obj", 0xdddddd);
     monkey->transform->position = {0, 2, 10};
     monkey->transform->setRotation(180, 0, 0);
 
-    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/sphereSmooth.obj", 0xffffff);
+    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/smooth.obj", 0xffffff);
     objCube->transform->position = {-2, 3, -10};
 
     shared_ptr<Model> axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes->transform->position = {2, 10, 2};
 
-    shared_ptr<Model> axes2 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes2->transform->position = {0,0,3};
-    axes2->transform->parent = axes->transform;
+    shared_ptr<Model> singleAxisForward = Model::fromOBJ(exeDir.string() + "resources/singleAxis.obj", 0xff);
+    singleAxisForward->transform->position = {0,0,3};
+    singleAxisForward->transform->setRotation(0, -90, 0);
+    singleAxisForward->transform->parent = axes->transform;
 
-    shared_ptr<Model> axes3 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes3->transform->position = {3,0,0};
-    axes3->transform->setRotation(-90, 0, 0);
-    axes3->transform->parent = axes->transform;
+    shared_ptr<Model> singleAxisRight = Model::fromOBJ(exeDir.string() + "resources/singleAxis.obj", 0xff0000);
+    singleAxisRight->transform->position = {3,0,0};
+    singleAxisRight->transform->setRotation(0, 0, -90);
+    singleAxisRight->transform->parent = axes->transform;
 
-    shared_ptr<Model> axes4 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
-    axes4->transform->position = {0,3,0};
-    axes4->transform->setRotation(0, 90, 0);
-    axes4->transform->parent = axes->transform;
+    shared_ptr<Model> singleAxisUp = Model::fromOBJ(exeDir.string() + "resources/singleAxis.obj", 0xff00);
+    singleAxisUp->transform->position = {0,3,0};
+    singleAxisUp->transform->setRotation(0, 0, 0);
+    singleAxisUp->transform->parent = axes->transform;
 
-    shared_ptr<Model> sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0xdddddd);
-    sphere->transform->position = {0,0,3};
-    sphere->transform->parent = axes2->transform;
+    shared_ptr<Model> cubeForward = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0x0000ff);
+    cubeForward->transform->position = {0,3,0};
+    cubeForward->transform->parent = singleAxisForward->transform;
+    cubeForward->transform->scale = {0.5f,0.5f,0.5f};
+
+    shared_ptr<Model> cubeRight = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0xff0000);
+    cubeRight->transform->position = {0,3,0};
+    cubeRight->transform->parent = singleAxisRight->transform;
+    cubeRight->transform->scale = {0.5f,0.5f,0.5f};
+
+    shared_ptr<Model> cubeUp = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0x00ff00);
+    cubeUp->transform->position = {0,3,0};
+    cubeUp->transform->parent = singleAxisUp->transform;
+    cubeUp->transform->scale = {0.5f,0.5f,0.5f};
 
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
     // minecraft.transform.position = {-2, 2, 2};
@@ -103,10 +115,12 @@ int main() {
     scene.models.push_back(monkey);  // 6
     scene.models.push_back(objCube); // 7
     scene.models.push_back(axes);    // 8
-    scene.models.push_back(axes2);   // 9
-    scene.models.push_back(sphere);  // 10
-    scene.models.push_back(axes3);   // 11
-    scene.models.push_back(axes4);   // 12
+    scene.models.push_back(singleAxisForward);   // 9
+    scene.models.push_back(cubeForward);  // 10
+    scene.models.push_back(singleAxisRight);   // 11
+    scene.models.push_back(singleAxisUp);   // 12
+    scene.models.push_back(cubeRight);
+    scene.models.push_back(cubeUp);
     // scene.models.push_back(minecraft);
 
     bool run = true;
@@ -135,7 +149,7 @@ int main() {
     }
 
 
-    bool doAnimations = true;
+    bool doAnimations = false;
     while (run) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -191,7 +205,6 @@ int main() {
             scene.models[3]->transform->incPitch(30.0f*deltaTime);
             scene.models[8]->transform->incRotation(60.0f*deltaTime);
             scene.models[6]->transform->incYaw(60.0f*deltaTime);
-            scene.models[9]->transform->incRotation(60.0f*deltaTime);
             scene.models[9]->transform->incRotation(60.0f*deltaTime);
             scene.models[11]->transform->incRotation(60.0f*deltaTime);
             scene.models[12]->transform->incRotation(60.0f*deltaTime);
