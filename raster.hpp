@@ -211,38 +211,74 @@ namespace Raster {
             inline __attribute__((always_inline)) float getPitch() {return toDegrees(pitch);};
             inline __attribute__((always_inline)) float getRoll() {return toDegrees(roll);};
 
-            void fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
-                auto par = parent.lock();
-                if (par && this != par.get()) {
-                    float3 iP, jP, kP;
-                    par->fetchBasisVectorsRecursive(&iP, &jP, &kP);
-                    *i = transformVector(iP, jP, kP, iHat);
-                    *j = transformVector(iP, jP, kP, jHat);
-                    *k = transformVector(iP, jP, kP, kHat);
-                } else {
-                    fetchBasisVectors(i, j, k);
+            std::vector<std::pair<triangle3D, float3>> fetchBasisVectorsRecursive(float3 *i, float3* j, float3* k) const {
+                // Find all the basis vectors of all the parents by looping, then apply them in reverse order (closest to root node to the youngest)
+
+                auto curParent = parent.lock();
+                // Here triangle3D is just being used as a 3x3 matrix, i was too lazy to actually make a matrix type
+                std::vector<std::pair<triangle3D,float3>> basisVectorsOfParents;
+                float3 myI,myJ,myK;
+                fetchBasisVectors(&myI, &myJ, &myK);
+                basisVectorsOfParents.push_back({{myI,myJ,myK},position});
+                while (curParent && this != curParent.get()) {
+                    float3 ip, jp, kp;
+                    curParent->fetchBasisVectors(&ip, &jp, &kp);
+                    basisVectorsOfParents.push_back({{ip,jp,kp},curParent->position});
+                    curParent = curParent->parent.lock();
                 }
+
+                float3 tI, tJ, tK;
+                const size_t sizeMinusOne = basisVectorsOfParents.size()-1;
+                const size_t sizeMinusTwo = sizeMinusOne-1;
+                tI = basisVectorsOfParents[sizeMinusOne].first.a;
+                tJ = basisVectorsOfParents[sizeMinusOne].first.b;
+                tK = basisVectorsOfParents[sizeMinusOne].first.c;
+                if (basisVectorsOfParents.size() > 1) {
+                    for (size_t l = 0; l <= sizeMinusTwo; ++l) {
+                        float3 _tI = transformVector(tI, tJ, tK, basisVectorsOfParents[sizeMinusTwo-l].first.a);
+                        float3 _tJ = transformVector(tI, tJ, tK, basisVectorsOfParents[sizeMinusTwo-l].first.b);
+                        float3 _tK = transformVector(tI, tJ, tK, basisVectorsOfParents[sizeMinusTwo-l].first.c);
+                        tI = _tI;
+                        tJ = _tJ;
+                        tK = _tK;
+                    }
+                }
+                if (i == nullptr || j == nullptr || k == nullptr) return basisVectorsOfParents;
+                *i = tI;
+                *j = tJ;
+                *k = tK;
+
+                return basisVectorsOfParents;
             }
 
             float3 getAbsolutePosition() const {
-                auto par = parent.lock();
-                if (par && this != par.get()) {
-                    const float3 parentPos = par->getAbsolutePosition();
+                auto curParrent = parent.lock();
+                auto parentBasisVectors = fetchBasisVectorsRecursive(nullptr, nullptr, nullptr);
+                // create a new vector of the applied parent basis vectors in reverse order
+                // the last element will just be the oldest basis vectors
+                // the second-last element will be the oldest basis vectors applied to the basis vectors of the corrosponding element
+                // and so on
 
-                    float3 parentIHat;
-                    float3 parentJHat;
-                    float3 parentKHat;
+                // return the position if we are the eldest node
+                if (parentBasisVectors.size() == 1) return position;
 
-                    par->fetchBasisVectorsRecursive(&parentIHat, &parentJHat, &parentKHat);
+                const size_t sizeMinusOne = parentBasisVectors.size()-1;
 
+                // Now, I can guarantee that parentBasisVectors.size() > 1 because if there are no parents, fetchBasisVectorsRecursive will return a length 1 vector containing our basis vectors
+                for (size_t i = 1; i <= sizeMinusOne; ++i) {
+                    // take the previous one, apply them, set the current one to those
+                    const size_t prevPos = parentBasisVectors.size()-i;
+                    const size_t sizeMinusOneMinusI = sizeMinusOne-i;
+                    triangle3D& curMatrix = parentBasisVectors[sizeMinusOneMinusI].first;
+                    const triangle3D& prevMatrix = parentBasisVectors[prevPos].first;
+                    curMatrix.a = transformVector(prevMatrix.a, prevMatrix.b, prevMatrix.c, curMatrix.a);
+                    curMatrix.b = transformVector(prevMatrix.a, prevMatrix.b, prevMatrix.c, curMatrix.b);
+                    curMatrix.c = transformVector(prevMatrix.a, prevMatrix.b, prevMatrix.c, curMatrix.c);
 
-                    const float3 rotatedPosition = transformVector(parentIHat, parentJHat, parentKHat, position);
-
-
-                    return rotatedPosition + parentPos;
+                    float3& curPos = parentBasisVectors[sizeMinusOneMinusI].second;
+                    curPos = parentBasisVectors[prevPos].second + transformVector(prevMatrix.a, prevMatrix.b, prevMatrix.c, curPos);
                 }
-
-                return position;
+                return parentBasisVectors[0].second;
             }
 
             static inline __attribute__((always_inline)) float3 transformVector(const float3& iHat, const float3& jHat, const float3& kHat, const float3& v) {
