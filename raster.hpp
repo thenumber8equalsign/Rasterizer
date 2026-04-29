@@ -126,6 +126,10 @@ namespace Raster {
             return x == other.x && y == other.y && z == other.z;
         }
 
+        inline __attribute__((always_inline)) bool operator!=(const float3& other) {
+            return x != other.x || y != other.y || z != other.z;
+        }
+
         inline __attribute__((always_inline)) float2 dropZ() const {
             return {x, y};
         }
@@ -133,6 +137,13 @@ namespace Raster {
         inline __attribute__((always_inline)) float3 normalize() const {
             const float mag = std::hypotf(x, std::hypotf(y, z));
             return {x/mag, y/mag, z/mag};
+        }
+
+        inline __attribute__((always_inline)) void normalizeNonConst() {
+            const float mag = std::hypotf(x, std::hypotf(y, z));
+            x /= mag;
+            y /= mag;
+            z /= mag;
         }
 
         static inline __attribute__((always_inline)) float dot(float3 a, float3 b) {
@@ -196,6 +207,7 @@ namespace Raster {
 
             std::weak_ptr<Transform> parent;
             float3 position;
+            float3 scale = {1,1,1};
 
             inline __attribute__((always_inline)) void setYaw(float yaw);
             inline __attribute__((always_inline)) void setPitch(float pitch);
@@ -204,6 +216,20 @@ namespace Raster {
             inline __attribute__((always_inline)) void incYaw(float inc);
             inline __attribute__((always_inline)) void incPitch(float inc);
             inline __attribute__((always_inline)) void incRoll(float inc);
+
+            inline __attribute__((always_inline)) void incRotation(float inc) {
+                inc = toRadians(inc);
+                yaw = normalizeAngle(yaw + inc);
+                pitch = normalizeAngle(pitch + inc);
+                roll = normalizeAngle(roll + inc);
+                updateBasisVectors();
+            };
+            inline __attribute__((always_inline)) void incRotation(float yaw, float pitch, float roll) {
+                this->yaw = normalizeAngle(this->yaw + toRadians(yaw));
+                this->pitch = normalizeAngle(this->pitch + toRadians(pitch));
+                this->roll = normalizeAngle(this->roll + toRadians(roll));
+                updateBasisVectors();
+            };
 
             inline __attribute__((always_inline)) void setRotation(float yaw, float pitch, float roll);
 
@@ -226,6 +252,7 @@ namespace Raster {
                     basisVectorsOfParents.push_back({{ip,jp,kp},curParent->position});
                     curParent = curParent->parent.lock();
                 }
+                if (i == nullptr || j == nullptr || k == nullptr) return basisVectorsOfParents;
 
                 float3 tI, tJ, tK;
                 const size_t sizeMinusOne = basisVectorsOfParents.size()-1;
@@ -243,7 +270,6 @@ namespace Raster {
                         tK = _tK;
                     }
                 }
-                if (i == nullptr || j == nullptr || k == nullptr) return basisVectorsOfParents;
                 *i = tI;
                 *j = tJ;
                 *k = tK;
@@ -570,6 +596,8 @@ namespace Raster {
                 return shader->getColour(uv, lightVector, normalVector, useLight);
             }
             static inline __attribute__((always_inline)) std::shared_ptr<Model> fromOBJ(const std::string&, const std::string&);
+            static inline __attribute__((always_inline)) std::shared_ptr<Model> fromOBJ(const std::string&, const uint32_t);
+            static inline __attribute__((always_inline)) std::shared_ptr<Model> fromOBJ(const std::string&);
     };
 
     class Camera {
@@ -659,14 +687,9 @@ namespace Raster {
 
     // Read from OBJ files
     // When exporting from blender, one must first mirror everything along y, then export with default settings (-z as forward and y as up)
-    inline __attribute__((always_inline)) std::shared_ptr<Model> Model::fromOBJ(const std::string& objName, const std::string& texFile = "") {
+    inline __attribute__((always_inline)) std::shared_ptr<Model> Model::fromOBJ(const std::string& objName) {
         std::ifstream file(objName.c_str());
         if (!file.is_open()) throw std::runtime_error("Could not open file");
-
-        std::optional<std::shared_ptr<TextureShader>> shader = std::nullopt;
-        if (texFile != "") {
-            shader = std::optional<std::shared_ptr<TextureShader>>(std::make_shared<TextureShader>(TextureShader::loadFromFile(texFile)));
-        }
 
         try {
             std::vector<std::string> allLines;
@@ -769,17 +792,22 @@ namespace Raster {
 
             // create a vector of triangle3D now to go with our model
             std::shared_ptr<Model> model = std::make_shared<Model>(std::make_shared<Transform>(Transform({0,0,0},0,0,0))); // use a default transform, the caller can change this later
-
             model->faces = faces;
 
-            if (shader.has_value()) {
-                model->shader = shader.value();
-            }
-
             return model;
-
         } catch (std::exception) {
             throw std::runtime_error("Bad OBJ File");
         }
     }
+    inline __attribute__((always_inline)) std::shared_ptr<Model> Model::fromOBJ(const std::string& objName, const std::string& texFile) {
+        std::shared_ptr<Model> model = fromOBJ(objName);
+        model->shader = std::make_shared<TextureShader>(TextureShader::loadFromFile(texFile));
+        return model;
+    }
+    inline __attribute__((always_inline)) std::shared_ptr<Model> Model::fromOBJ(const std::string& objName, const uint32_t col) {
+        std::shared_ptr<Model> model = fromOBJ(objName);
+        model->shader = std::make_shared<SolidColourShader>(col);
+        return model;
+    }
+
 }

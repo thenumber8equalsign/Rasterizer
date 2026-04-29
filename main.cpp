@@ -59,30 +59,16 @@ int main() {
     greenTri->shader = std::make_shared<SolidColourShader>(0x00aa00);
 
     float cubeSize = 10;
-    shared_ptr<Model> ground = make_shared<Model>(make_shared<Transform>(Transform({0, -cubeSize, 0}, 0, 0, 0)));
-    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {-cubeSize, cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, -cubeSize}, {-cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, cubeSize, cubeSize}, {-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{cubeSize, cubeSize, cubeSize}, {cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{cubeSize, cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, -cubeSize, -cubeSize}, {cubeSize, -cubeSize, -cubeSize}, {-cubeSize, -cubeSize, cubeSize}}, std::nullopt, std::nullopt});
-    ground->faces.push_back({{{-cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, cubeSize}, {cubeSize, -cubeSize, -cubeSize}}, std::nullopt, std::nullopt});
-    ground->shader = std::make_shared<SolidColourShader>(0xdddddd);
+    std::shared_ptr<Model> ground = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0xdddddd);
+    ground->transform->position = {0,-cubeSize,0};
+    ground->transform->scale = {cubeSize,cubeSize,cubeSize};
 
-
-    shared_ptr<Model> monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", exeDir.string() + "resources/rock.bin");
+    shared_ptr<Model> monkey = Model::fromOBJ(exeDir.string() + "resources/monkey.obj", 0xdddddd);
     monkey->transform->position = {0, 2, 10};
     monkey->transform->setRotation(180, 0, 0);
-    monkey->shader = std::make_shared<SolidColourShader>(0xdddddd);
 
-    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
+    shared_ptr<Model> objCube = Model::fromOBJ(exeDir.string() + "resources/smooth.obj", 0xffffff);
     objCube->transform->position = {-2, 3, -10};
-    objCube->shader = std::make_shared<SolidColourShader>(0xffffff);
 
     shared_ptr<Model> axes = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
     axes->transform->position = {2, 10, 2};
@@ -91,9 +77,18 @@ int main() {
     axes2->transform->position = {0,0,3};
     axes2->transform->parent = axes->transform;
 
-    shared_ptr<Model> sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj");
+    shared_ptr<Model> axes3 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes3->transform->position = {3,0,0};
+    axes3->transform->setRotation(-90, 0, 0);
+    axes3->transform->parent = axes->transform;
+
+    shared_ptr<Model> axes4 = Model::fromOBJ(exeDir.string() + "resources/axis.obj", exeDir.string() + "resources/RGB.bin");
+    axes4->transform->position = {0,3,0};
+    axes4->transform->setRotation(0, 90, 0);
+    axes4->transform->parent = axes->transform;
+
+    shared_ptr<Model> sphere = Model::fromOBJ(exeDir.string() + "resources/cube.obj", 0xdddddd);
     sphere->transform->position = {0,0,3};
-    sphere->shader = make_shared<SolidColourShader>(0xdddddd);
     sphere->transform->parent = axes2->transform;
 
     // Model minecraft = Model::fromOBJ(exeDir.string() + "resources/minecraftCube.obj", exeDir.string() + "resources/grass.bin");
@@ -108,8 +103,10 @@ int main() {
     scene.models.push_back(monkey);  // 6
     scene.models.push_back(objCube); // 7
     scene.models.push_back(axes);    // 8
-    scene.models.push_back(axes2);
-    scene.models.push_back(sphere);
+    scene.models.push_back(axes2);   // 9
+    scene.models.push_back(sphere);  // 10
+    scene.models.push_back(axes3);   // 11
+    scene.models.push_back(axes4);   // 12
     // scene.models.push_back(minecraft);
 
     bool run = true;
@@ -192,13 +189,12 @@ int main() {
             scene.models[5]->transform->incYaw(180.0f*deltaTime);
             scene.models[3]->transform->incRoll(30.0f*deltaTime);
             scene.models[3]->transform->incPitch(30.0f*deltaTime);
-            scene.models[8]->transform->incYaw(60.0f*deltaTime);
-            scene.models[8]->transform->incPitch(60.0f*deltaTime);
-            scene.models[8]->transform->incRoll(60.0f*deltaTime);
-            scene.models[9]->transform->incYaw(60.0f*deltaTime);
+            scene.models[8]->transform->incRotation(60.0f*deltaTime);
             scene.models[6]->transform->incYaw(60.0f*deltaTime);
-            scene.models[9]->transform->incPitch(60.0f*deltaTime);
-            scene.models[9]->transform->incRoll(60.0f*deltaTime);
+            scene.models[9]->transform->incRotation(60.0f*deltaTime);
+            scene.models[9]->transform->incRotation(60.0f*deltaTime);
+            scene.models[11]->transform->incRotation(60.0f*deltaTime);
+            scene.models[12]->transform->incRotation(60.0f*deltaTime);
 
             if (scene.models[3]->transform->position.y > 15) {
                 greenTriMoveUp = false;
@@ -258,7 +254,7 @@ int main() {
         }
 
         for (int i = 0; i < scene.models.size(); ++i) {
-            const auto model = scene.models[i];
+            const auto& model = scene.models[i];
             float3 ihat, jhat, khat;
             model->transform->fetchBasisVectorsRecursive(&ihat, &jhat, &khat);
 
@@ -272,6 +268,15 @@ int main() {
                 // do some stuff with a depth buffer
 
                 float3 a = face.verticies.a, b = face.verticies.b, c = face.verticies.c;
+                a.x *= model->transform->scale.x;
+                a.y *= model->transform->scale.y;
+                a.z *= model->transform->scale.z;
+                b.x *= model->transform->scale.x;
+                b.y *= model->transform->scale.y;
+                b.z *= model->transform->scale.z;
+                c.x *= model->transform->scale.x;
+                c.y *= model->transform->scale.y;
+                c.z *= model->transform->scale.z;
 
                 // Rotate along the model's basis vectors
                 a = Transform::transformVector(ihat, jhat, khat, a);
@@ -305,10 +310,9 @@ int main() {
                 nC = Transform::transformVector(ihat, jhat, khat, nC);
 
                 // Rotate along the inverse of the camera
-                nA = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nA);
-                nB = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nB);
-                nC = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nC);
-
+                nA = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nA).normalize();
+                nB = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nB).normalize();
+                nC = Transform::transformVector(ihatcaminv, jhatcaminv, khatcaminv, nC).normalize();
 
                 auto projectedTriangle = project({a,b,c}, scene.camera, SCREEN_HEIGHT);
                 if (projectedTriangle.has_value()) {
@@ -364,13 +368,13 @@ int main() {
 
 
                                 float2 uv = {0,0};
-                                if (face.texCoords != nullopt) {
+                                if (face.texCoords.has_value()) {
                                     const triangle& uvs = face.texCoords.value();
                                     const float3 u = {uvs.a.x/tri.a.z, uvs.b.x/tri.b.z, uvs.c.x/tri.c.z};
                                     const float3 v = {uvs.a.y/tri.a.z, uvs.b.y/tri.b.z, uvs.c.y/tri.c.z};
 
-                                    uv.x = float3::dot(u,weight)*depth;
-                                    uv.y = float3::dot(v,weight)*depth;
+                                    uv.x = float3::dot(u, weight) * depth;
+                                    uv.y = float3::dot(v, weight) * depth;
                                 }
 
                                 // To undo the perspective, we can divide by pixelsPerWorldUnit, and then multiply by the interpolated depth
@@ -378,9 +382,22 @@ int main() {
                                 const float pixelsPerWorldUnit = SCREEN_HEIGHT / screenHeightUnits;
 
                                 float3 actualPoint{p.x/pixelsPerWorldUnit*depth, p.y/pixelsPerWorldUnit*depth, depth};
-                                actualPoint = actualPoint.normalize();
+                                actualPoint.normalizeNonConst();
 
-                                uint32_t col = model->getColour(uv, actualPoint, nA.normalize(), face.normals.has_value()) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
+                                float3 normal = float3_zero;
+                                if (face.normals.has_value()) {
+                                    float3 normalX{nA.x / tri.a.z, nB.x / tri.b.z, nC.x / tri.b.z};
+                                    float3 normalY{nA.y / tri.a.z, nB.y / tri.b.z, nC.y / tri.b.z};
+                                    float3 normalZ{nA.z / tri.a.z, nB.z / tri.b.z, nC.z / tri.b.z};
+                                    normal.x = float3::dot(normalX, weight) * depth;
+                                    normal.y = float3::dot(normalY, weight) * depth;
+                                    normal.z = float3::dot(normalZ, weight) * depth;
+                                    normal.normalizeNonConst();
+                                } else {
+                                    normal = nA;
+                                }
+
+                                uint32_t col = model->getColour(uv, actualPoint, normal.normalize(), face.normals.has_value()) | 0xff000000; // add 0xff000000 for the alpha, this must be opaqe
 
                                 colourBuffer[k][l] = col;
                             }
@@ -394,8 +411,6 @@ int main() {
         SDL_UpdateTexture(texture, NULL, colourBuffer, SCREEN_WIDTH * sizeof(uint32_t));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
-
-        cout << 1/deltaTime << endl;
     }
 
     SDL_DestroyWindow(window);
